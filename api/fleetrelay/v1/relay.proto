@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+package fleetrelay.v1;
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/fleetrelay/fleetrelay/gen/fleetrelay/v1;fleetrelayv1";
+
+service DeviceRelayService {
+  rpc Connect(stream ConnectRequest) returns (stream ConnectResponse);
+}
+
+message ConnectRequest {
+  oneof message {
+    DeviceHello hello = 1;
+    Heartbeat heartbeat = 2;
+    Telemetry telemetry = 3;
+    DeviceAlert alert = 4;
+    CommandAck command_ack = 5;
+  }
+}
+
+message ConnectResponse {
+  oneof message {
+    ServerHello hello = 1;
+    Command command = 2;
+    LeaseUpdate lease_update = 3;
+    ServerHeartbeat heartbeat = 4;
+    DisconnectNotice disconnect = 5;
+  }
+}
+
+message DeviceHello {
+  string device_id = 1;
+  string adapter = 2;
+  repeated string capabilities = 3;
+  string client_version = 4;
+}
+
+message Heartbeat {
+  uint64 session_generation = 1;
+}
+
+message Telemetry {
+  string topic = 1;
+  google.protobuf.Struct fields = 2;
+  google.protobuf.Timestamp observed_at = 3;
+}
+
+message DeviceAlert {
+  string code = 1;
+  string severity = 2;
+  string detail = 3;
+}
+
+enum AckResult {
+  ACK_RESULT_UNSPECIFIED = 0;
+  ACK_RESULT_SUCCEEDED = 1;
+  ACK_RESULT_FAILED = 2;
+  ACK_RESULT_REJECTED = 3;
+  ACK_RESULT_UNSUPPORTED = 4;
+}
+
+message CommandAck {
+  string command_id = 1;
+  AckResult result = 2;
+  string detail = 3;
+  uint64 session_generation = 4;
+  uint64 lease_epoch = 5;
+  uint64 device_sequence = 6;
+  string device_id = 7;
+}
+
+message ServerHello {
+  string session_id = 1;
+  uint64 session_generation = 2;
+  uint32 heartbeat_interval_seconds = 3;
+  google.protobuf.Timestamp server_time = 4;
+}
+
+message Command {
+  string command_id = 1;
+  string idempotency_key = 2;
+  string command_type = 3;
+  google.protobuf.Struct payload = 4;
+  uint64 device_sequence = 5;
+  uint64 session_generation = 6;
+  uint64 lease_epoch = 7;
+  google.protobuf.Timestamp expires_at = 8;
+}
+
+message LeaseUpdate {
+  string lease_id = 1;
+  uint64 lease_epoch = 2;
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message ServerHeartbeat {
+  google.protobuf.Timestamp server_time = 1;
+}
+
+message DisconnectNotice {
+  string reason = 1;
+  uint32 reconnect_after_seconds = 2;
+}
