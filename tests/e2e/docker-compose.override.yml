@@ -1,0 +1,28 @@
+services:
+  control-api:
+    ports: !override ["18080:8080"]
+
+  gateway-a:
+    ports: !override ["18081:8081", "19090:9090"]
+
+  gateway-b:
+    ports: !override ["18083:8081", "19091:9090"]
+
+  device-sim:
+    environment:
+      ADAPTER_DELAY_MS: "10000"
+
+  dispatcher:
+    ports: !override ["18082:8082"]
+
+  web:
+    ports: !override ["13000:80"]
+
+  otel-collector:
+    ports: !reset []
+
+  prometheus:
+    ports: !override ["19092:9090"]
+
+  grafana:
+    ports: !override ["13001:3000"]
