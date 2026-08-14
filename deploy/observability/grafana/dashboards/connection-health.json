@@ -1,0 +1,11 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "panels": [
+    { "type": "timeseries", "title": "Connected devices per Gateway", "id": 1, "gridPos": { "h": 9, "w": 12, "x": 0, "y": 0 }, "targets": [{ "expr": "connected_devices", "legendFormat": "{{instance}}" }] },
+    { "type": "timeseries", "title": "Device reconnect latency", "id": 2, "gridPos": { "h": 9, "w": 12, "x": 12, "y": 0 }, "targets": [{ "expr": "histogram_quantile(0.95, sum by (le) (rate(device_reconnect_seconds_bucket[5m])))", "legendFormat": "p95" }], "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] } },
+    { "type": "timeseries", "title": "gRPC stream lifetime", "id": 3, "gridPos": { "h": 9, "w": 12, "x": 0, "y": 9 }, "targets": [{ "expr": "histogram_quantile(0.50, sum by (le) (rate(grpc_stream_duration_seconds_bucket[5m])))", "legendFormat": "p50" }, { "expr": "histogram_quantile(0.95, sum by (le) (rate(grpc_stream_duration_seconds_bucket[5m])))", "legendFormat": "p95" }] },
+    { "type": "timeseries", "title": "WebSocket outbound queue", "id": 4, "gridPos": { "h": 9, "w": 12, "x": 12, "y": 9 }, "targets": [{ "expr": "max by (instance) (websocket_outbound_queue_depth)", "legendFormat": "{{instance}}" }] }
+  ],
+  "refresh": "10s", "schemaVersion": 41, "tags": ["fleetrelay"], "templating": { "list": [] }, "time": { "from": "now-1h", "to": "now" }, "title": "Connection Health", "uid": "fleetrelay-connection-health", "version": 1
+}
