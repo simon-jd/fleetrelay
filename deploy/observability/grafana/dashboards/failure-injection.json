@@ -1,0 +1,11 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "panels": [
+    { "type": "state-timeline", "title": "Control-plane availability", "id": 1, "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 }, "targets": [{ "expr": "up{job=~\"control-api|stream-gateway|dispatcher\"}", "legendFormat": "{{job}} / {{instance}}" }] },
+    { "type": "timeseries", "title": "Redis consumer lag", "id": 2, "gridPos": { "h": 9, "w": 8, "x": 0, "y": 8 }, "targets": [{ "expr": "max(redis_consumer_lag)", "legendFormat": "lag" }] },
+    { "type": "timeseries", "title": "Stale fencing rejections", "id": 3, "gridPos": { "h": 9, "w": 8, "x": 8, "y": 8 }, "targets": [{ "expr": "sum(rate(stale_lease_rejections_total[1m]))", "legendFormat": "lease" }, { "expr": "sum(rate(stale_session_rejections_total[1m]))", "legendFormat": "session" }] },
+    { "type": "timeseries", "title": "Pending outbox age", "id": 4, "gridPos": { "h": 9, "w": 8, "x": 16, "y": 8 }, "targets": [{ "expr": "max(outbox_oldest_unpublished_seconds)", "legendFormat": "age" }], "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] } }
+  ],
+  "refresh": "5s", "schemaVersion": 41, "tags": ["fleetrelay", "chaos"], "templating": { "list": [] }, "time": { "from": "now-30m", "to": "now" }, "title": "Failure Injection", "uid": "fleetrelay-failure-injection", "version": 1
+}
