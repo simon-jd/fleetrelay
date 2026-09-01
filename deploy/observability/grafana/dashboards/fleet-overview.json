@@ -1,0 +1,22 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "graphTooltip": 1,
+  "panels": [
+    { "type": "stat", "title": "Connected devices", "id": 1, "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 }, "targets": [{ "expr": "sum(connected_devices)", "legendFormat": "devices" }] },
+    { "type": "stat", "title": "Connected operators", "id": 2, "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 }, "targets": [{ "expr": "sum(connected_operators)", "legendFormat": "operators" }] },
+    { "type": "stat", "title": "Active alerts", "id": 3, "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 }, "targets": [{ "expr": "sum(ALERTS{alertstate=\"firing\"})", "legendFormat": "alerts" }] },
+    { "type": "stat", "title": "Services up", "id": 4, "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 }, "targets": [{ "expr": "sum(up{job=~\"control-api|stream-gateway|dispatcher\"})", "legendFormat": "targets" }] },
+    { "type": "timeseries", "title": "Telemetry ingress", "id": 5, "gridPos": { "h": 9, "w": 12, "x": 0, "y": 6 }, "targets": [{ "expr": "sum(rate(telemetry_received_total[1m]))", "legendFormat": "received/s" }, { "expr": "sum(rate(telemetry_dropped_total[1m]))", "legendFormat": "dropped/s" }] },
+    { "type": "timeseries", "title": "Commands by status", "id": 6, "gridPos": { "h": 9, "w": 12, "x": 12, "y": 6 }, "targets": [{ "expr": "sum by (status) (rate(commands_by_status_total[1m]))", "legendFormat": "{{status}}" }] }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 41,
+  "tags": ["fleetrelay"],
+  "templating": { "list": [] },
+  "time": { "from": "now-30m", "to": "now" },
+  "timezone": "browser",
+  "title": "Fleet Overview",
+  "uid": "fleetrelay-overview",
+  "version": 1
+}

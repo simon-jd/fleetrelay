@@ -1,0 +1,236 @@
+name: fleetrelay
+
+x-service-env: &service-env
+  DATABASE_URL: postgres://${POSTGRES_USER:-fleetrelay}:${POSTGRES_PASSWORD:-fleetrelay-dev-only}@postgres:5432/${POSTGRES_DB:-fleetrelay}?sslmode=disable
+  REDIS_ADDR: redis:6379
+  OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector:4317
+  OTEL_EXPORTER_OTLP_INSECURE: "true"
+  LOG_LEVEL: ${LOG_LEVEL:-info}
+  INTERNAL_SHARED_TOKEN: ${INTERNAL_SHARED_TOKEN:-fleetrelay-compose-internal-only}
+  DEV_OPERATOR_TOKEN: ${DEV_OPERATOR_TOKEN:-dev-operator-token}
+  DEV_VIEWER_TOKEN: ${DEV_VIEWER_TOKEN:-dev-viewer-token}
+
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+  init: true
+  networks: [fleetrelay]
+  security_opt: [no-new-privileges:true]
+
+services:
+  postgres:
+    <<: *service-defaults
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fleetrelay}
+      POSTGRES_USER: ${POSTGRES_USER:-fleetrelay}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fleetrelay-dev-only}
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    volumes: [postgres-data:/var/lib/postgresql/data]
+
+  redis:
+    <<: *service-defaults
+    image: redis:8.2-alpine
+    command: [redis-server, --appendonly, "yes", --appendfsync, everysec]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    volumes: [redis-data:/data]
+
+  migrate:
+    <<: *service-defaults
+    image: postgres:17.6-alpine
+    restart: "no"
+    environment:
+      PGHOST: postgres
+      PGDATABASE: ${POSTGRES_DB:-fleetrelay}
+      PGUSER: ${POSTGRES_USER:-fleetrelay}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-fleetrelay-dev-only}
+    volumes: [../../migrations:/migrations:ro]
+    command: [sh, -c, "test \"$$(psql -Atc \"SELECT to_regclass('public.devices')\")\" = devices || psql --set ON_ERROR_STOP=1 --file /migrations/000001_initial.up.sql"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  control-api:
+    <<: *service-defaults
+    build:
+      context: ../..
+      dockerfile: deploy/docker/go-service.Dockerfile
+      args: { SERVICE: control-api }
+    environment:
+      <<: *service-env
+      HTTP_ADDR: :8080
+      GRPC_ADDR: :9080
+      JWT_DEV_SECRET: ${JWT_DEV_SECRET:-replace-this-local-development-secret}
+    ports: ["8080:8080"]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+      otel-collector: { condition: service_started }
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8080/healthz]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
+
+  gateway-a:
+    <<: *service-defaults
+    build:
+      context: ../..
+      dockerfile: deploy/docker/go-service.Dockerfile
+      args: { SERVICE: stream-gateway }
+    environment:
+      <<: *service-env
+      GATEWAY_ID: gateway-a
+      HTTP_ADDR: :8081
+      GRPC_ADDR: :9090
+      CONTROL_API_URL: http://control-api:8080
+      WS_ORIGINS: localhost:3000
+    ports: ["8081:8081", "9090:9090"]
+    depends_on:
+      control-api: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8081/healthz]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
+  gateway-b:
+    <<: *service-defaults
+    build:
+      context: ../..
+      dockerfile: deploy/docker/go-service.Dockerfile
+      args: { SERVICE: stream-gateway }
+    environment:
+      <<: *service-env
+      GATEWAY_ID: gateway-b
+      HTTP_ADDR: :8081
+      GRPC_ADDR: :9090
+      CONTROL_API_URL: http://control-api:8080
+      WS_ORIGINS: localhost:3000
+    ports: ["8083:8081", "9091:9090"]
+    depends_on:
+      control-api: { condition: service_healthy }
+      redis: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1:8081/healthz]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
+  dispatcher:
+    <<: *service-defaults
+    build:
+      context: ../..
+      dockerfile: deploy/docker/go-service.Dockerfile
+      args: { SERVICE: dispatcher }
+    environment:
+      <<: *service-env
+      METRICS_ADDR: :8082
+      CONTROL_API_ADDR: control-api:9080
+    ports: ["8082:8082"]
+    depends_on:
+      control-api: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  device-sim:
+    <<: *service-defaults
+    build:
+      context: ../..
+      dockerfile: deploy/docker/go-service.Dockerfile
+      args: { SERVICE: device-sim }
+    environment:
+      GATEWAY_GRPC_ADDR: gateway-a:9090,gateway-b:9090
+      DEVICE_ID: vacuum-floor-1
+      OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector:4317
+      OTEL_EXPORTER_OTLP_INSECURE: "true"
+    depends_on:
+      gateway-a: { condition: service_healthy }
+      gateway-b: { condition: service_healthy }
+
+  device-sim-floor-2:
+    <<: *service-defaults
+    build:
+      context: ../..
+      dockerfile: deploy/docker/go-service.Dockerfile
+      args: { SERVICE: device-sim }
+    environment:
+      GATEWAY_GRPC_ADDR: gateway-b:9090,gateway-a:9090
+      DEVICE_ID: vacuum-floor-2
+    depends_on:
+      gateway-b: { condition: service_healthy }
+
+  device-sim-floor-3:
+    <<: *service-defaults
+    build:
+      context: ../..
+      dockerfile: deploy/docker/go-service.Dockerfile
+      args: { SERVICE: device-sim }
+    environment:
+      GATEWAY_GRPC_ADDR: gateway-a:9090,gateway-b:9090
+      DEVICE_ID: vacuum-floor-3
+    depends_on:
+      gateway-a: { condition: service_healthy }
+
+  web:
+    <<: *service-defaults
+    build:
+      context: ../../web
+    ports: ["3000:80"]
+    depends_on:
+      control-api: { condition: service_healthy }
+      gateway-a: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1/]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+
+  otel-collector:
+    <<: *service-defaults
+    image: otel/opentelemetry-collector-contrib:0.135.0
+    command: [--config=/etc/otelcol-contrib/config.yaml]
+    volumes:
+      - ../observability/otel-collector.yml:/etc/otelcol-contrib/config.yaml:ro
+    ports: ["4317:4317", "4318:4318"]
+
+  prometheus:
+    <<: *service-defaults
+    image: prom/prometheus:v3.6.0
+    command: [--config.file=/etc/prometheus/prometheus.yml, --storage.tsdb.retention.time=7d, --web.enable-lifecycle]
+    volumes:
+      - ../observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../observability/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    ports: ["9092:9090"]
+    depends_on: [control-api, gateway-a, gateway-b, dispatcher, otel-collector]
+
+  grafana:
+    <<: *service-defaults
+    image: grafana/grafana:12.1.1
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-fleetrelay-dev-only}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ../observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    ports: ["3001:3000"]
+    depends_on: [prometheus]
+
+networks:
+  fleetrelay: {}
+
+volumes:
+  postgres-data: {}
+  redis-data: {}
+  prometheus-data: {}
+  grafana-data: {}

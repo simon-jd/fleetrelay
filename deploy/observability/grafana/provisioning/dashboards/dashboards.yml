@@ -1,0 +1,10 @@
+apiVersion: 1
+providers:
+  - name: FleetRelay
+    orgId: 1
+    folder: FleetRelay
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards

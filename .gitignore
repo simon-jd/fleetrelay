@@ -1,0 +1,8 @@
+.env
+deploy/compose/.env
+web/node_modules/
+web/dist/
+web/*.tsbuildinfo
+coverage/
+docs/evidence/**/*.json
+!docs/evidence/.gitkeep
