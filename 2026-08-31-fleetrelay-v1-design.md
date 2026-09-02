@@ -2,10 +2,12 @@
 
 > Go 实时设备集群控制平面，以及多楼层扫地机器人参考应用
 
-- 状态：已批准的 V1 架构设计，等待用户文档复核
+- 状态：V1 目标规格；当前实现状态以验证报告为准，不代表生产就绪
 - 日期：2026-08-31
 - 设计路径：先构建通用控制平面，再接入家庭扫地机器人
 - 目标岗位：北美 Backend、Distributed Systems、Cloud/Infrastructure、Robotics Platform
+- 生产扩展：[FleetRelay 生产设计基线](docs/production-design.md)
+- 当前证据：[原型验证报告](docs/evidence/validation-report.md)
 
 ## 1. 执行摘要
 
