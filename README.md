@@ -28,7 +28,7 @@ React console ── REST/WebSocket ──► stream-gateway (2 instances)
 Planned OTLP instrumentation ──► OpenTelemetry Collector ──► Prometheus/Grafana
 ```
 
-The approved design and its correctness arguments are in [the V1 specification](2026-08-31-fleetrelay-v1-design.md). Operational procedures are in [the runbook](docs/runbook.md), and reproducible test evidence is summarized in [the validation report](docs/evidence/validation-report.md).
+The product thesis and V1 correctness arguments are in [the V1 specification](2026-08-31-fleetrelay-v1-design.md). The target security, tenancy, durable replay, HA/DR, SLO, release, and go-live gates are defined in [the production design baseline](docs/production-design.md). Operational procedures are in [the runbook](docs/runbook.md), and reproducible prototype evidence is summarized in [the validation report](docs/evidence/validation-report.md).
 
 ## Local stack
 
@@ -133,6 +133,8 @@ deploy/observability/   collector and Prometheus/Grafana scaffolding
 scripts/                failure demonstrations
 docs/                   runbook, design notes and generated evidence
 ```
+
+The [documentation index](docs/README.md) distinguishes target specifications from currently verified behavior.
 
 ## Security boundary
 
