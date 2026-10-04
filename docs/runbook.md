@@ -1,24 +1,24 @@
 # FleetRelay Local Operations Runbook
 
-This runbook covers the partial Docker Compose prototype. It does not describe a production deployment or promise measured performance, reliability, security, or complete observability. Failure behavior below is explicitly labeled either current behavior or a design acceptance target.
+This runbook covers the partial Docker Compose prototype. It documents local measurements and fault exercises; it does not describe a production deployment or certify reliability, security, capacity, or complete observability. Failure behavior below is explicitly labeled either current behavior or a design acceptance target.
 
-Current limitations: durable browser replay, complete command retry/expiry/ACK-timeout reconciliation, JWT verification, production authorization, service authentication, TLS/device mTLS, and Go OpenTelemetry instrumentation are not implemented. WebSocket reconnect, a fresh snapshot, live status updates, and any current-state polling are recovery aids, not an ordered or lossless event replay. The collector and dashboards are scaffolding, not evidence that an end-to-end trace or reliability objective has been met.
+Current limitations: durable browser replay, production-grade command scheduling and UNKNOWN-outcome reconciliation, JWT verification, production authorization, service authentication, TLS/device mTLS, and Go OpenTelemetry instrumentation are not implemented. WebSocket reconnect, a fresh snapshot, live status updates, and any current-state polling are recovery aids, not an ordered or lossless event replay. Dispatcher outbox gauges, Prometheus scrapes/down alerts and Grafana provisioning have local execution evidence. Remaining dashboard series and the OTLP collector path are scaffolding.
 
 ## Service topology and health
 
 | Service | Internal ports | Healthy when | Dependency failure behavior |
 |---|---:|---|---|
-| `control-api` | HTTP `8080` | `/healthz` and `/readyz` currently report process health; dependency-aware readiness is pending | PostgreSQL-backed mutations return errors when the database is unavailable |
-| `gateway-a`, `gateway-b` | HTTP/WS `8081`, device gRPC `9090` | process is live; readiness can reach Redis | Connected streams end when their Gateway stops; automatic cross-Gateway recovery is not yet implemented |
-| `dispatcher` | configured metrics `8082` | no dedicated health endpoint is implemented; inspect process state and logs | Commands already committed with outbox rows remain in PostgreSQL |
-| `device-sim` | none | three device sessions are visible | reconnects to its configured Gateway with jitter; it does not select an alternate Gateway |
+| `control-api` | HTTP `8080` | `/healthz` reports liveness; `/readyz` checks PostgreSQL and configured Redis | PostgreSQL-backed mutations return errors when the database is unavailable |
+| `gateway-a`, `gateway-b` | HTTP/WS `8081`, device gRPC `9090` | readiness reaches Redis and the Control API readiness endpoint | Connected streams end; the simulator rotates through its configured Gateway addresses and obtains a new session generation |
+| `dispatcher` | configured metrics `8082` | `/healthz` reports liveness; `/readyz` checks PostgreSQL and Redis | Commands already committed with outbox rows remain in PostgreSQL |
+| `device-sim` | none | configured device sessions are visible | rotates configured Gateways with bounded exponential reconnect delay; optional journal retains simulator results across restart |
 | `postgres` | `5432` | `pg_isready` succeeds | no authoritative mutations are accepted |
 | `redis` | `6379` | `PING` returns `PONG` | realtime transport pauses; durable state is unchanged |
 | `otel-collector` | OTLP `4317`, `4318` | collector configuration loads and its endpoints listen | Go services do not currently emit OTLP application telemetry |
 | `prometheus` | host `9092` | targets page reports configured scrapes | most application-specific metrics are not instrumented yet |
 | `grafana` | host `3001` | UI loads provisioned dashboards | application correctness is unaffected |
 
-Liveness means the process can answer. Production readiness must prove that the service can safely perform its authoritative role. The prototype's Control API readiness handler is not dependency-aware, so do not treat it as a production routing signal.
+Liveness means the process can answer. Production readiness must prove that the service can safely perform its authoritative role. The local Control API readiness check returns 503 on PostgreSQL failure; it does not certify managed failover or production routing safety.
 
 ## Start and verify
 
@@ -69,7 +69,7 @@ Run one failure at a time against a healthy stack. The helper always attempts to
 sh scripts/demo-failures.sh gateway
 ```
 
-Design acceptance target (not implemented or verified end to end):
+The Docker lab verifies accepted-command recovery through a replacement Gateway. The broader design acceptance target remains:
 
 - Connections on `gateway-a` close and affected devices briefly report offline or reconnecting.
 - Devices reconnect through `gateway-b`; new sessions have a higher `session_generation`.
@@ -83,7 +83,7 @@ Design acceptance target (not implemented or verified end to end):
 sh scripts/demo-failures.sh redis
 ```
 
-Design acceptance target (only durable outbox storage and basic republishing are partially implemented):
+The Docker lab verifies a queued command remains pending through a Redis pause and succeeds after recovery. The broader design acceptance target remains:
 
 - Already accepted commands remain in PostgreSQL and may remain `PENDING_TRANSPORT`.
 - New `REQUIRE_ONLINE` commands return `UNAVAILABLE` because presence cannot be trusted.
@@ -96,7 +96,7 @@ Design acceptance target (only durable outbox storage and basic republishing are
 sh scripts/demo-failures.sh postgres
 ```
 
-Design acceptance target (not verified end to end):
+The Docker lab verifies readiness failure and retained-command recovery after a PostgreSQL SIGKILL. The broader design acceptance target remains:
 
 - New leases, commands, and authoritative status transitions return unavailable.
 - Redis data is not promoted to authoritative control state.
@@ -143,11 +143,11 @@ Check both Gateway readiness endpoints, then inspect simulator logs. The prototy
 
 ### Commands remain `PENDING_TRANSPORT`
 
-Check Redis, Dispatcher, outbox age, current presence, the command's attempt count, lease validity, and latest device session. The retry worker scans once per second and uses a fixed three-second attempt deadline. It creates at most `MAX_DELIVERY_ATTEMPTS` attempts (default 3) for the same command; a command that is still `PENDING_TRANSPORT` at that limit receives no more attempts and remains pending until its command expiry changes it to `EXPIRED`. Do not directly update the command row, and do not infer execution from an attempt record: the PostgreSQL insert and Redis publication are separate operations.
+Check Redis, Dispatcher, outbox age, current presence, the command's attempt count, lease validity, and latest device session. The retry worker scans once per second and uses a fixed three-second attempt deadline. It creates at most `MAX_DELIVERY_ATTEMPTS` attempts (default 3) for the same command; a command that is still `PENDING_TRANSPORT` at that limit receives no more attempts and remains pending until its command expiry changes it to `EXPIRED`. Do not directly update the command row, and do not infer execution from an attempt record: the attempt and delivery intent commit together, while Redis publication is a separate operation.
 
 ### Command reaches `ACK_TIMEOUT`
 
-The worker redelivers a `DISPATCHED` command under the same `command_id` after an attempt deadline, using current Redis presence and a newly validated PostgreSQL attempt. At the configured attempt limit (default 3), or when the command expires after dispatch, it marks the command `ACK_TIMEOUT`. This is a bounded, fixed-interval mechanism: it has no exponential backoff, device execution-state query, or complete late-ACK audit/reconciliation workflow. Redis publication is not atomic with attempt creation, so an attempt row alone is not delivery evidence. Execution remains unknown; do not create a new command or infer non-execution from a missing ACK.
+The worker redelivers a `DISPATCHED` command under the same `command_id` after an attempt deadline, using current Redis presence and a newly validated PostgreSQL attempt. At the configured attempt limit (default 3), or when the command expires after dispatch, it marks the command `ACK_TIMEOUT`. This is a bounded, fixed-interval mechanism: it has no exponential backoff, device execution-state query, or complete late-ACK audit/reconciliation workflow. Attempt and delivery intent creation are atomic in PostgreSQL. Redis publication is separate, so an attempt row alone is not delivery evidence. Execution remains unknown; do not create a new command or infer non-execution from a missing ACK.
 
 ### Development token is rejected
 
@@ -155,7 +155,7 @@ The console's token field uses a static development credential. HTTP requests ca
 
 ### Grafana has no data
 
-Open Prometheus targets at <http://localhost:9092/targets>. Verify service `/metrics` endpoints and collector ports. Current service metrics are minimal placeholders and the Go processes are not OTLP-instrumented, so the supplied dashboards do not yet constitute end-to-end observability evidence.
+Open Prometheus targets at <http://localhost:9092/targets>. Verify service `/metrics` endpoints and collector ports. Dispatcher outbox gauges are real PostgreSQL observations; the local lab verifies four application scrape targets and the provisioned outbox panel queries through the Grafana API. ACK-latency and other uninstrumented panels can still be empty. Go processes do not emit OTLP traces.
 
 ## Backup, reset, and shutdown
 
@@ -182,3 +182,150 @@ Every benchmark or failure report should include:
 - Device, operator, subscription, telemetry, command-rate, duration, and adapter-latency parameters.
 - p50, p95, p99, maximum, errors, reconnect distribution, and duplicate side-effect count.
 - Raw output and failed acceptance thresholds; never rewrite a design target as a measured result.
+
+## Delivery-intent regression checks (2026-09-06)
+
+`make test-integration` starts dedicated PostgreSQL/Redis containers on loopback
+ports 15439/16389, builds race-enabled service binaries, runs the transaction and
+publication tests plus a four-process simulator smoke test, and removes only
+those disposable test containers/data and temporary binaries. It requires Go
+1.26.8+ and Docker Compose. Normal `go test` skips live tests when their explicit
+environment variables are absent; CI sets `FLEETRELAY_REQUIRE_INTEGRATION=1` so a
+missing dependency setting fails rather than silently skips.
+
+To reproduce the full evidence set (also requires Buf and installed web dependencies):
+
+```sh
+docker compose -f tests/integration/compose.yml up -d --wait
+export FLEETRELAY_TEST_DATABASE_URL='postgres://fleetrelay:integration-only@127.0.0.1:15439/fleetrelay_test?sslmode=disable'
+export FLEETRELAY_TEST_REDIS_ADDR='127.0.0.1:16389'
+python3 scripts/verify-delivery.py
+docker compose -f tests/integration/compose.yml down --volumes
+```
+
+The evidence collector replaces files under `docs/evidence/2026-09-06/`; archive
+them first if retaining a previous run. Its baseline negative control checks out
+`84206e1` into a temporary directory; it never resets the working repository.
+
+Inspect unresolved publication intents:
+
+```sql
+SELECT outbox_id AS delivery_id, aggregate_id AS command_id,
+       payload->'attempt'->>'attempt' AS attempt, created_at
+FROM outbox WHERE kind='command.delivery' AND published_at IS NULL
+ORDER BY created_at;
+```
+
+A stable delivery ID can appear under multiple Redis Stream IDs after an ambiguous
+XADD. Do not create an extra device attempt manually to clear that backlog.
+The worker preflights stale/expired intents, retires them, and retries publication
+of current intents. `published_at` is also used for retired intents, so it is not
+an audit proof of device receipt. See [ADR-017](adr/017-prototype-delivery-intents.md)
+for rollout/rollback compatibility and the remaining scheduler/permit limits.
+
+## Outbox retry isolation (2026-09-07)
+
+Upgrade existing volumes before starting the September 7 store/Dispatcher code:
+
+```sh
+docker compose --env-file deploy/compose/.env -f deploy/compose/docker-compose.yml run --rm migrate
+```
+
+The guarded `migrations/apply.sql` handles a fresh database and a prior migration-1
+volume; rerunning it retains pending retry times. It runs in one transaction with
+a migration advisory lock and a five-second lock acquisition limit. A lock timeout
+fails the migration rather than starting services with a partial schema. This
+procedure is for the local prototype, not a zero-downtime large-table migration.
+
+The Dispatcher still permits one active process. After an XADD or completion
+failure, the original row stays pending and receives a database-timed backoff.
+Inspect without changing state:
+
+```sql
+SELECT outbox_id, kind, aggregate_id, publication_failures,
+       created_at, next_publish_at, published_at
+FROM outbox
+WHERE published_at IS NULL
+ORDER BY next_publish_at, created_at, outbox_id
+LIMIT 100;
+```
+
+`publication_failures` counts transport/completion failures, not device attempts.
+For a bad payload, investigate its writer and use logs with the outbox ID; do not
+mark it published or delete it merely to silence an alert. For Redis outages,
+restore Redis and let the existing UUID/payload retry. A commit-confirmation error
+can mean Redis already accepted the message. Duplicate stream entries are allowed.
+
+```sh
+curl --fail http://localhost:8082/metrics
+make test-integration
+# Alert behavior, using the existing Prometheus version:
+docker run --rm --network none --entrypoint /bin/promtool \
+  -v "$PWD/deploy/observability:/rules:ro" prom/prometheus:v3.6.0 \
+  test rules /rules/outbox-alerts.test.yml
+```
+
+The three outbox gauges are pending count, delayed-retry count and oldest pending
+age. They include delayed rows; an empty due-work batch does not imply a drained
+backlog. Metrics query errors return 503, making the Prometheus scrape fail. The
+backlog and retry-waiting alerts are validated with promtool. Other dashboard
+series such as ACK latency remain planned. `make test-integration` now also needs
+`psql`, runs reversible migration checks and uses explicitly disposable services.
+
+For rollback to September 6 code, stop the current Dispatcher and keep migration
+2's columns. If reverting the schema, first stop all new-version Go services,
+then apply `000002_outbox_retry.down.sql` transactionally; it preserves rows but
+loses retry schedules/counts. Earlier rollback must also follow ADR-017. The tests
+verify SQL rollback, not a live mixed-version release campaign. See
+[ADR-018](adr/018-outbox-retry-isolation.md) and the
+[verification report](evidence/2026-09-07/report.md).
+
+
+## Isolated Docker recovery and latency lab
+
+Use `tests/docker/compose.yml` for the measured follow-up, separate from the
+operator-demo topology. It binds service ports to dynamic loopback ports and uses
+only the `fleetrelay-evidence-lab` project. Application containers run as non-root
+with a read-only root, dropped capabilities, no-new-privileges, a writable `/tmp`,
+1 CPU and 256 MiB limits. PostgreSQL/Redis and per-device journals use named volumes.
+The lab intentionally uses static local credentials and plaintext networking.
+
+An exact pre-optimization working-tree archive is retained with the report's raw
+artifacts; the older Git HEAD alone does not include the September 7 baseline.
+Extract that archive to `/tmp/fleetrelay-baseline` and supply its `baseline`
+subdirectory. Docker Engine/Compose v2 and Python 3 are required:
+
+```sh
+python3 scripts/build-docker-lab.py --baseline /tmp/fleetrelay-baseline/baseline
+python3 scripts/verify-docker-lab.py --phase all --output /tmp/fleetrelay-docker-lab
+# Inspect only this disposable project:
+docker compose -p fleetrelay-evidence-lab -f tests/docker/compose.yml ps
+```
+
+The harness submits commands through REST and observes terminal results through
+REST polling. For this fixture only it extends acquired lease deadlines to one
+hour using SQL; command TTL is two minutes. Normal application lease defaults
+remain unchanged. Reliability runs use real container SIGKILL/pause/restart,
+real PostgreSQL/Redis and a synthetic device effect. The logical restore compares
+row counts and ordered row-JSON hashes across seven core tables in another
+local database. It is not PITR or a restore in another region.
+
+Performance runs alternate AB/BA order across five pairs, recreate only the
+Dispatcher, exclude four warm-up commands per device, and measure 25 commands
+per device per run on four concurrent sequential clients. Baseline and candidate
+use the same other services, simulator journals and resource limits. The report
+compares the median of five per-run nearest-rank p95 values. This closed-loop
+experiment is not a saturation test or production SLO assessment.
+
+Archive output before another run (the harness overwrites same-named result
+files). To finish or recover an interrupted experiment, inspect this project's
+paused/stopped services and resume/recreate them. Once its evidence is archived,
+the following removes **only the disposable lab state**, including journals:
+
+```sh
+docker compose -p fleetrelay-evidence-lab -f tests/docker/compose.yml --profile fault down --volumes
+```
+
+The [executed report](evidence/2026-09-07-docker/report.md) separates container,
+simulator, hardware, cloud and production evidence. No hosting, cloud account,
+physical device or production traffic is involved.

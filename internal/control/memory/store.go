@@ -277,6 +277,9 @@ func (s *Store) Acknowledge(_ context.Context, ack control.Ack, now time.Time) (
 func (s *Store) CreateAttempt(_ context.Context, commandID, gateway string, generation uint64, routed, deadline time.Time) (control.CommandAttempt, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if !deadline.After(routed) {
+		return control.CommandAttempt{}, control.ErrInvalid
+	}
 	c, ok := s.commands[commandID]
 	if !ok {
 		return control.CommandAttempt{}, control.ErrNotFound
@@ -309,9 +312,33 @@ func (s *Store) CreateAttempt(_ context.Context, commandID, gateway string, gene
 			return control.CommandAttempt{}, control.ErrConflict
 		}
 	}
+	for _, a := range s.attempts[commandID] {
+		if a.Deadline.After(routed) {
+			return control.CommandAttempt{}, control.ErrConflict
+		}
+	}
+	if s.deliveryPending(commandID) {
+		return control.CommandAttempt{}, control.ErrConflict
+	}
 	a := control.CommandAttempt{CommandID: commandID, Attempt: uint32(len(s.attempts[commandID]) + 1), TargetGatewayID: gateway, TargetSessionGeneration: generation, RoutedAt: routed, Deadline: deadline}
 	s.attempts[commandID] = append(s.attempts[commandID], a)
+	s.appendOutbox("command.delivery", commandID, control.Delivery{Command: c, Attempt: a}, routed)
+	for id, item := range s.outbox {
+		if item.AggregateID == commandID && item.Kind == "command.created" {
+			s.published[id] = true
+		}
+	}
 	return a, nil
+}
+
+// Caller holds mu.
+func (s *Store) deliveryPending(commandID string) bool {
+	for id, item := range s.outbox {
+		if item.AggregateID == commandID && item.Kind == "command.delivery" && !s.published[id] {
+			return true
+		}
+	}
+	return false
 }
 
 func (s *Store) PrepareOutboxCommand(_ context.Context, id string, now time.Time) (control.Command, bool, error) {
@@ -321,7 +348,7 @@ func (s *Store) PrepareOutboxCommand(_ context.Context, id string, now time.Time
 	if !ok {
 		return c, false, control.ErrNotFound
 	}
-	if c.Status != control.StatusPendingTransport {
+	if c.Status != control.StatusPendingTransport || len(s.attempts[id]) > 0 {
 		return c, true, nil
 	}
 	to := control.CommandStatus("")
@@ -353,7 +380,7 @@ func (s *Store) ListRetryCandidates(_ context.Context, now time.Time, limit int)
 		}
 		c := s.commands[id]
 		last := attempts[len(attempts)-1]
-		if (c.Status == control.StatusPendingTransport || c.Status == control.StatusDispatched) && !last.Deadline.After(now) {
+		if (c.Status == control.StatusPendingTransport || c.Status == control.StatusDispatched) && !last.Deadline.After(now) && (!c.ExpiresAt.After(now) || !s.deliveryPending(id)) {
 			out = append(out, control.RetryCandidate{Command: c, LastAttempt: last, AttemptCount: uint32(len(attempts))})
 		}
 	}
@@ -372,6 +399,9 @@ func (s *Store) ResolveAttemptDeadline(_ context.Context, id string, max uint32,
 		return c, false, control.ErrNotFound
 	}
 	attempts := s.attempts[id]
+	if c.ExpiresAt.After(now) && (s.deliveryPending(id) || (len(attempts) > 0 && attempts[len(attempts)-1].Deadline.After(now))) {
+		return c, false, nil
+	}
 	to := control.CommandStatus("")
 	if c.Status == control.StatusPendingTransport && !c.ExpiresAt.After(now) {
 		to = control.StatusExpired
@@ -408,11 +438,24 @@ func (s *Store) ClaimOutbox(_ context.Context, limit int) ([]control.OutboxItem,
 	return result, nil
 }
 
-func (s *Store) MarkOutboxPublished(_ context.Context, id string, _ time.Time) error {
+func (s *Store) MarkOutboxPublished(_ context.Context, id string, now time.Time) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if _, ok := s.outbox[id]; !ok {
+	item, ok := s.outbox[id]
+	if !ok || s.published[id] {
 		return control.ErrNotFound
+	}
+	if item.Kind == "command.delivery" {
+		var d control.Delivery
+		if err := json.Unmarshal(item.Payload, &d); err != nil {
+			return err
+		}
+		attempts := s.attempts[d.Command.ID]
+		for i := range attempts {
+			if attempts[i].Attempt == d.Attempt.Attempt {
+				attempts[i].Deadline = now.Add(d.Attempt.Deadline.Sub(d.Attempt.RoutedAt))
+			}
+		}
 	}
 	s.published[id] = true
 	return nil

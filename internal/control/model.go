@@ -126,11 +126,19 @@ type CommandAttempt struct {
 }
 
 type OutboxItem struct {
-	ID          string          `json:"outbox_id"`
-	AggregateID string          `json:"aggregate_id"`
-	Kind        string          `json:"kind"`
-	Payload     json.RawMessage `json:"payload"`
-	CreatedAt   time.Time       `json:"created_at"`
+	ID                  string          `json:"outbox_id"`
+	AggregateID         string          `json:"aggregate_id"`
+	Kind                string          `json:"kind"`
+	Payload             json.RawMessage `json:"payload"`
+	CreatedAt           time.Time       `json:"created_at"`
+	PublicationFailures int             `json:"publication_failures"`
+}
+
+// Delivery is an immutable transport intent, committed with its attempt.
+// The enclosing outbox ID is the stable delivery ID across Redis retries.
+type Delivery struct {
+	Command Command        `json:"command"`
+	Attempt CommandAttempt `json:"attempt"`
 }
 
 type RetryCandidate struct {

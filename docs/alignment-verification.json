@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "verified_at": "2026-10-04T04:18:23.042211+00:00",
+  "provenance": "Owner-confirmed cloud results remain separate from these local checks.",
+  "notes": [
+    "Real PostgreSQL/Redis/gRPC integration and base Go race tests passed. Docker restore/latency campaign not rerun.",
+    "Publishes local atomic outbox, retry isolation, committed-intent followup, fsynced simulator journal and their regression tests."
+  ],
+  "checks": [
+    {
+      "command": "GOCACHE=/tmp/alignment-go-cache go test -race -count=1 ./...",
+      "exit_code": 0,
+      "elapsed_seconds": 22.5,
+      "log_sha256": "cb9be94a9bbbe4480275d67282b0d085abd3200ae55976c7d9bbdf8b8a6fad9b"
+    },
+    {
+      "command": "GOCACHE=/tmp/alignment-go-cache make test-integration",
+      "exit_code": 0,
+      "elapsed_seconds": 8.99,
+      "log_sha256": "eeb93276ff04a141119c93121bee15885fb3d11254c158c126bcacd86433b177"
+    }
+  ]
+}

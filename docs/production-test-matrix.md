@@ -2,6 +2,18 @@
 
 状态：Proposed。任何场景只有生成独立 run_id 和全部必需证据后才算通过。
 
+2026-09-07 的[本地 Docker 实验](evidence/2026-09-07-docker/report.md)补充了部分
+工程前置证据，没有把本表任何生产门禁改为通过：
+
+| 对应方向 | 已执行的本地子集 | 仍缺的关键条件 |
+|---|---|---|
+| HA-PG / HA-PGF | 单 PostgreSQL 容器 SIGKILL、卷上 WAL 恢复、已提交命令继续完成 | 托管主库切换、多实例/N-1 负载、提交集合 RPO |
+| HA-REDIS | 暂停 Redis 后原命令保留并恢复投递 | 空集群重建、持续压力和长时故障 |
+| DEV-IDEM | 结果落盘后 ACK 前模拟器退出；重启复用结果；并发重复及损坏文件测试 | 10k 命令、物理/外部计数、实际断电和厂商 UNKNOWN 语义 |
+| OPS-BACKUP | pg_dump/pg_restore 至同实例另一数据库，七张核心表计数及内容哈希一致 | 独立账号/实例、base backup+WAL、PITR、恢复后真实硬件 E2E |
+| LOAD-N1 | 四个模拟设备、五组交替 A/B、每版本 500 条命令延迟 | N-1/AZ、热租户、突发、容量拐点和 24h soak |
+| OBS | 真实抓取、Dispatcher down 告警触发/恢复、Grafana API 配置验证 | 告警通知送达、OTLP、完整关键告警和生产 SLO |
+
 模式：
 
 - A：自动化阻断门禁；

@@ -6,3 +6,7 @@ web/*.tsbuildinfo
 coverage/
 docs/evidence/**/*.json
 !docs/evidence/.gitkeep
+!docs/evidence/2026-09-06/*.json
+!docs/evidence/2026-09-07/*.json
+!docs/evidence/2026-09-07-docker/*.json
+__pycache__/

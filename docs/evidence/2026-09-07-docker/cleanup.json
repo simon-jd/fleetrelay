@@ -1,0 +1,19 @@
+{
+  "completed_at": "2026-09-07T23:36:34.655011+00:00",
+  "command": [
+    "docker",
+    "compose",
+    "-p",
+    "fleetrelay-evidence-lab",
+    "-f",
+    "tests/docker/compose.yml",
+    "--profile",
+    "fault",
+    "down",
+    "--volumes"
+  ],
+  "exit_code": 0,
+  "remaining_lab_containers": [],
+  "remaining_lab_volumes": [],
+  "scope": "Only explicitly named disposable Docker lab; bank backups, raw evidence and images retained."
+}

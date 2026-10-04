@@ -24,7 +24,12 @@ func main() {
 	defer cancel()
 	addresses := strings.Split(env("GATEWAY_GRPC_ADDR", "stream-gateway:9090"), ",")
 	device := env("DEVICE_ID", "vacuum-floor-2")
-	state := newDeviceState()
+	state, err := openDeviceState(os.Getenv("DEVICE_JOURNAL_PATH"), device)
+	if err != nil {
+		log.Error("open execution journal", "error", err)
+		os.Exit(1)
+	}
+	defer state.Close()
 	backoff := time.Second
 	next := 0
 	for ctx.Err() == nil {
@@ -47,20 +52,6 @@ func main() {
 	}
 }
 
-type cachedResult struct {
-	Result fleetrelayv1.AckResult
-	Detail string
-}
-type deviceState struct {
-	mu                  sync.Mutex
-	executed            map[string]cachedResult
-	dropped             map[string]bool
-	lastSeq, leaseEpoch uint64
-}
-
-func newDeviceState() *deviceState {
-	return &deviceState{executed: make(map[string]cachedResult), dropped: make(map[string]bool)}
-}
 func run(ctx context.Context, conn *grpc.ClientConn, device string, state *deviceState, log *slog.Logger) error {
 	runCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -118,35 +109,15 @@ func run(ctx context.Context, conn *grpc.ClientConn, device string, state *devic
 		if c == nil {
 			continue
 		}
-		state.mu.Lock()
-		cached, seen := state.executed[c.CommandId]
-		ack := &fleetrelayv1.CommandAck{CommandId: c.CommandId, DeviceId: device, SessionGeneration: generation, LeaseEpoch: c.LeaseEpoch, DeviceSequence: c.DeviceSequence}
-		if !seen {
-			ack.Result = fleetrelayv1.AckResult_ACK_RESULT_SUCCEEDED
-			ack.Detail = "executed by deterministic simulator"
-			switch {
-			case c.SessionGeneration != generation:
-				ack.Result = fleetrelayv1.AckResult_ACK_RESULT_REJECTED
-				ack.Detail = "stale_session"
-			case c.LeaseEpoch < state.leaseEpoch:
-				ack.Result = fleetrelayv1.AckResult_ACK_RESULT_REJECTED
-				ack.Detail = "stale_lease"
-			case c.DeviceSequence <= state.lastSeq:
-				ack.Result = fleetrelayv1.AckResult_ACK_RESULT_REJECTED
-				ack.Detail = "stale_sequence"
-			case c.ExpiresAt.AsTime().Before(time.Now()):
-				ack.Result = fleetrelayv1.AckResult_ACK_RESULT_REJECTED
-				ack.Detail = "expired"
-			default:
-				time.Sleep(duration("ADAPTER_DELAY_MS", 25) * time.Millisecond)
-				state.lastSeq = c.DeviceSequence
-				state.leaseEpoch = c.LeaseEpoch
-			}
-			state.executed[c.CommandId] = cachedResult{Result: ack.Result, Detail: ack.Detail}
-		} else {
-			ack.Result = cached.Result
-			ack.Detail = cached.Detail
+		ack, executed, err := state.execute(runCtx, device, generation, c, duration("ADAPTER_DELAY_MS", 25)*time.Millisecond)
+		if err != nil {
+			return fmt.Errorf("execute simulator command: %w", err)
 		}
+		if executed && state.path != "" && env("SIM_EXIT_AFTER_PERSIST", "false") == "true" {
+			log.Warn("injected simulator exit after durable result before ACK", "command_id", c.CommandId)
+			os.Exit(86)
+		}
+		state.mu.Lock()
 		drop := env("DROP_FIRST_ACK", "false") == "true" && !state.dropped[c.CommandId]
 		if drop {
 			state.dropped[c.CommandId] = true

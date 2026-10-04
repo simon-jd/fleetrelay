@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "bank_json_and_reference_validation": true,
+  "target_entry_matches_reviewed_draft": true,
+  "evidence_sha256_verified": 35,
+  "archived_raw_files_verified": 46,
+  "baseline_files_checked": 117,
+  "measured_commands_found_in_persistent_simulator_journals": 1000,
+  "limitations": "Journal membership is simulation evidence only."
+}

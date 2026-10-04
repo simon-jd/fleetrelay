@@ -1,0 +1,112 @@
+{
+  "checked_local_date": "2026-09-07",
+  "records": [
+    {
+      "url": "https://api.ashbyhq.com/posting-api/job-board/zettabyte-space",
+      "checked_at": "2026-09-07T22:19:59.638240+00:00",
+      "sha256": "4a9a8c80f305e926fe5eebf793fe9349683ba84e73bd238eb100f0a215ec4678",
+      "jobs": [
+        {
+          "title": "Software Engineer (New Grad)",
+          "publishedAt": "2026-04-08T18:46:04.308+00:00",
+          "location": "United States",
+          "jobUrl": "https://jobs.ashbyhq.com/zettabyte-space/50a9c6dc-7225-4ff0-a914-69d1dd325d6a"
+        }
+      ]
+    },
+    {
+      "url": "https://api.ashbyhq.com/posting-api/job-board/hipp",
+      "checked_at": "2026-09-07T22:19:59.612745+00:00",
+      "sha256": "2412b1f5d37ef5a58d54b62fa4320879c11302bf942aa56e3e12006ff030ad1d",
+      "jobs": [
+        {
+          "title": "Software Engineer - New Grad",
+          "publishedAt": "2026-06-18T13:57:54.115+00:00",
+          "location": "United States",
+          "jobUrl": "https://jobs.ashbyhq.com/hipp/ea04e914-674c-4c05-b40a-7e8a035bad14"
+        }
+      ]
+    },
+    {
+      "url": "https://api.ashbyhq.com/posting-api/job-board/eventualcomputing",
+      "checked_at": "2026-09-07T22:19:59.612358+00:00",
+      "sha256": "8b23b02382efaec178a0eadce1065014703ee34a07d2145731a1271f581de4ab",
+      "jobs": []
+    },
+    {
+      "url": "https://api.github.com/repos/jackc/pgx",
+      "checked_at": "2026-09-07T22:19:59.650397+00:00",
+      "sha256": "115f5754ac770563e2cd95e5ebfd202ab0a699145de1a16ab58f0f9ec31a97f1",
+      "metadata": {
+        "full_name": "jackc/pgx",
+        "archived": false,
+        "pushed_at": "2026-09-07T22:17:38Z"
+      }
+    },
+    {
+      "url": "https://api.github.com/repos/redis/go-redis",
+      "checked_at": "2026-09-07T22:19:59.643914+00:00",
+      "sha256": "3a4d60e1e46dcf3f463523a383a0cd68a947620d801bf12f6e834cad0c7c5ae4",
+      "metadata": {
+        "full_name": "redis/go-redis",
+        "archived": false,
+        "pushed_at": "2026-09-06T18:19:12Z"
+      }
+    },
+    {
+      "url": "https://api.github.com/repos/grpc/grpc-go",
+      "checked_at": "2026-09-07T22:19:59.644101+00:00",
+      "sha256": "5f72b5f13ab8fd319b27ed229fdffecee38e5868c3c28977d52942a312ec458f",
+      "metadata": {
+        "full_name": "grpc/grpc-go",
+        "archived": false,
+        "pushed_at": "2026-09-07T09:52:19Z"
+      }
+    },
+    {
+      "url": "https://api.github.com/repos/redis/go-redis/releases/latest",
+      "checked_at": "2026-09-07T22:19:59.851803+00:00",
+      "sha256": "aa0c610602018722aa60e424146f2ffe73eedd3a0fe98ab890d8da2dd5efff01",
+      "metadata": {
+        "tag_name": "v9.22.0",
+        "published_at": "2026-08-03T17:43:00Z",
+        "prerelease": false
+      }
+    },
+    {
+      "url": "https://api.github.com/repos/grpc/grpc-go/releases/latest",
+      "checked_at": "2026-09-07T22:19:59.817308+00:00",
+      "sha256": "109cdad5328d93c927195c2f1d4e71975c08d3acc1aa261ee5ee2bb5490fab35",
+      "metadata": {
+        "tag_name": "v1.83.2",
+        "published_at": "2026-08-25T16:31:23Z",
+        "prerelease": false
+      }
+    },
+    {
+      "url": "https://raw.githubusercontent.com/redis/go-redis/master/README.md",
+      "checked_at": "2026-09-07T22:19:59.853498+00:00",
+      "sha256": "ec82dce4b78e637bbe20db396a8462ad1a53990b44d4b255a1c44f43b7808243",
+      "raw_path": "/tmp/fleetrelay-update-20260907/go-redis-README.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/jackc/pgx/master/README.md",
+      "checked_at": "2026-09-07T22:19:59.830334+00:00",
+      "sha256": "d6e1b491c80299105070aa33555a53525ee791efb08053c7277bc5149b750355",
+      "raw_path": "/tmp/fleetrelay-update-20260907/pgx-README.md"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/jackc/pgx/master/CHANGELOG.md",
+      "checked_at": "2026-09-07T22:19:59.856725+00:00",
+      "sha256": "20d8e3aa081c6c704b29c9cfdad6e6d61171bb8cc64c0e2257a4e0c1cc0a708c",
+      "raw_path": "/tmp/fleetrelay-update-20260907/pgx-CHANGELOG.md"
+    }
+  ],
+  "web_checked_pages": [
+    "https://stripe.com/careers/listing/software-engineer-new-grad/8128744",
+    "https://go.dev/doc/devel/release",
+    "https://www.postgresql.org/docs/17/sql-altertable.html",
+    "https://prometheus.io/docs/instrumenting/exposition_formats/"
+  ],
+  "scope": "Small official current-job sample; ATS publication dates are distinguished from crawl/check dates."
+}

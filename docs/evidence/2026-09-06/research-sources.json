@@ -1,0 +1,71 @@
+{
+  "checked_at": "2026-09-06",
+  "official_ats_checks": [
+    {
+      "company_board": "foxglove",
+      "checked_at": "2026-09-06",
+      "source": "https://api.ashbyhq.com/posting-api/job-board/foxglove",
+      "response_sha256": "d444f187bf36e721167389f3826d14c1e7a66fc9f456db6b69d888a0921f94a7",
+      "target_ids": [
+        "def61478-8b86-43e5-b27b-be7b76900449"
+      ],
+      "matched_listings": [],
+      "listing_count": 1,
+      "note": "Absence from current public listing does not establish an exact closure date."
+    },
+    {
+      "company_board": "benchling",
+      "checked_at": "2026-09-06",
+      "source": "https://api.ashbyhq.com/posting-api/job-board/benchling",
+      "response_sha256": "96b4e6c4e96d559e339d33aab8f3e80824ca953e76fea71630941165d96a6f81",
+      "target_ids": [
+        "b3c9b312-6e2b-4dbc-9b15-0b0310d75a7f"
+      ],
+      "matched_listings": [],
+      "listing_count": 49,
+      "note": "Absence from current public listing does not establish an exact closure date."
+    },
+    {
+      "company_board": "zettabyte-space",
+      "checked_at": "2026-09-06",
+      "source": "https://api.ashbyhq.com/posting-api/job-board/zettabyte-space",
+      "response_sha256": "4a9a8c80f305e926fe5eebf793fe9349683ba84e73bd238eb100f0a215ec4678",
+      "target_ids": [
+        "50a9c6dc-7225-4ff0-a914-69d1dd325d6a"
+      ],
+      "matched_listings": [
+        {
+          "id": "50a9c6dc-7225-4ff0-a914-69d1dd325d6a",
+          "title": "Software Engineer (New Grad)",
+          "publishedAt": "2026-04-08T18:46:04.308+00:00",
+          "isListed": true,
+          "location": "United States",
+          "jobUrl": "https://jobs.ashbyhq.com/zettabyte-space/50a9c6dc-7225-4ff0-a914-69d1dd325d6a"
+        }
+      ],
+      "listing_count": 9,
+      "note": "publishedAt is ATS metadata, not inferred from search crawl date."
+    },
+    {
+      "company_board": "hipp",
+      "checked_at": "2026-09-06",
+      "source": "https://api.ashbyhq.com/posting-api/job-board/hipp",
+      "response_sha256": "2412b1f5d37ef5a58d54b62fa4320879c11302bf942aa56e3e12006ff030ad1d",
+      "target_ids": [
+        "ea04e914-674c-4c05-b40a-7e8a035bad14"
+      ],
+      "matched_listings": [
+        {
+          "id": "ea04e914-674c-4c05-b40a-7e8a035bad14",
+          "title": "Software Engineer - New Grad",
+          "publishedAt": "2026-06-18T13:57:54.115+00:00",
+          "isListed": true,
+          "location": "United States",
+          "jobUrl": "https://jobs.ashbyhq.com/hipp/ea04e914-674c-4c05-b40a-7e8a035bad14"
+        }
+      ],
+      "listing_count": 5,
+      "note": "publishedAt is ATS metadata, not inferred from search crawl date."
+    }
+  ]
+}

@@ -1,0 +1,460 @@
+{
+  "checked_at": "2026-09-07T22:30:55.341482+00:00",
+  "base_commit": "84206e198423529c244ef4ac12072230a004e8df",
+  "environment": {
+    "mode": "local_real_postgresql_redis_and_device_simulator",
+    "os": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "cpu": "13th Gen Intel(R) Core(TM) i9-13900K",
+    "logical_cpus": 32,
+    "memory": "MemTotal:       129209084 kB",
+    "runtime": "go version go1.26.8 linux/amd64",
+    "docker": "29.8.0",
+    "postgres": "17.6",
+    "redis": "Redis server v=8.2.9 sha=00000000:1 malloc=jemalloc-5.3.0 bits=64 build=50fae648cb7b8097",
+    "node": "v20.19.5",
+    "topology": "One Linux workstation; dedicated Docker PostgreSQL/Redis on loopback 15439/16389; four race-built native Go service processes; deterministic simulated device.",
+    "dataset": "23 top-level Go tests, including 64 malformed outbox rows plus one healthy event and one command submitted twice in the simulator E2E."
+  },
+  "checks": [
+    {
+      "name": "migration-bootstrap",
+      "command": [
+        "psql",
+        "-X",
+        "postgres://fleetrelay:integration-only@127.0.0.1:15439/fleetrelay_test?sslmode=disable",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--file",
+        "tests/integration/migrations.sql"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.115,
+      "log_path": "/tmp/fleetrelay-update-20260907/migration-bootstrap.log",
+      "log_sha256": "5be39c0a8112905e6e5be85466f839b3eece3d97635ad27c7cb2818f93fcff5a"
+    },
+    {
+      "name": "baseline-regression",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-run",
+        "^TestOutboxBatchMakesProgressPastPoisonRows$",
+        "-v",
+        "./cmd/dispatcher"
+      ],
+      "cwd": "/tmp/fleetrelay-update-20260907/baseline",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "elapsed_seconds": 0.715,
+      "log_path": "/tmp/fleetrelay-update-20260907/baseline-regression.log",
+      "log_sha256": "7750b0bc2c1a6a2f5b5934c9a5de679b8a26493816aa5105bb6ee3ea55e39f23"
+    },
+    {
+      "name": "race-build",
+      "command": [
+        "go",
+        "build",
+        "-race",
+        "-o",
+        "/tmp/fleetrelay-update-20260907/bin/",
+        "./cmd/..."
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 4.422,
+      "log_path": "/tmp/fleetrelay-update-20260907/race-build.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "go-race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-coverprofile=/tmp/fleetrelay-update-20260907/coverage.out",
+        "-covermode=atomic",
+        "-json",
+        "./..."
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 6.291,
+      "log_path": "/tmp/fleetrelay-update-20260907/go-race.log",
+      "log_sha256": "2e73b387ea5c448472970fd557c8145b1ee41e28820d65358ce3576b84b52aab"
+    },
+    {
+      "name": "coverage",
+      "command": [
+        "go",
+        "tool",
+        "cover",
+        "-func=/tmp/fleetrelay-update-20260907/coverage.out"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.114,
+      "log_path": "/tmp/fleetrelay-update-20260907/coverage.log",
+      "log_sha256": "a80e755a656075874a1f9a1b5b316cefc542d488a5dfce8713831811c3dadf35"
+    },
+    {
+      "name": "go-vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 4.852,
+      "log_path": "/tmp/fleetrelay-update-20260907/go-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "go-build",
+      "command": [
+        "go",
+        "build",
+        "./cmd/..."
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.615,
+      "log_path": "/tmp/fleetrelay-update-20260907/go-build.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gofmt",
+      "command": [
+        "sh",
+        "-c",
+        "test -z \"$(gofmt -l cmd internal)\""
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.016,
+      "log_path": "/tmp/fleetrelay-update-20260907/gofmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "buf-format",
+      "command": [
+        "buf",
+        "format",
+        "--diff",
+        "--exit-code"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.064,
+      "log_path": "/tmp/fleetrelay-update-20260907/buf-format.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "buf-lint",
+      "command": [
+        "buf",
+        "lint"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.064,
+      "log_path": "/tmp/fleetrelay-update-20260907/buf-lint.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "buf-build",
+      "command": [
+        "buf",
+        "build"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.032,
+      "log_path": "/tmp/fleetrelay-update-20260907/buf-build.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "compose-config",
+      "command": [
+        "docker",
+        "compose",
+        "--env-file",
+        "deploy/compose/.env.example",
+        "-f",
+        "deploy/compose/docker-compose.yml",
+        "config",
+        "--quiet"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.064,
+      "log_path": "/tmp/fleetrelay-update-20260907/compose-config.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "alert-rules",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--entrypoint",
+        "/bin/promtool",
+        "-v",
+        "/home/postedism/Desktop/Go FleetRelay/deploy/observability:/rules:ro",
+        "prom/prometheus:v3.6.0",
+        "test",
+        "rules",
+        "/rules/outbox-alerts.test.yml"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.765,
+      "log_path": "/tmp/fleetrelay-update-20260907/alert-rules.log",
+      "log_sha256": "8289a4919870ab5b28f5e90a86b4af3cdbd8c244516c02fca90d6e3f289a6711"
+    },
+    {
+      "name": "web-test",
+      "command": [
+        "npm",
+        "test"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay/web",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.565,
+      "log_path": "/tmp/fleetrelay-update-20260907/web-test.log",
+      "log_sha256": "def7fbf40d48c3547c68b3afb8e6b1489e9fbbdbc270900f3cac7038e95658f1"
+    },
+    {
+      "name": "web-lint",
+      "command": [
+        "npm",
+        "run",
+        "lint"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay/web",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.765,
+      "log_path": "/tmp/fleetrelay-update-20260907/web-lint.log",
+      "log_sha256": "c3e929a22938d0f983336f0031c6f22b4e945e4d1b2080b54eca0ac6490ac4d4"
+    },
+    {
+      "name": "web-build",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay/web",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 1.316,
+      "log_path": "/tmp/fleetrelay-update-20260907/web-build.log",
+      "log_sha256": "249534eaac2ef196b1fdf40cf1644e69f50816dd563a9190226e03f856d99ac6"
+    },
+    {
+      "name": "docker-version",
+      "command": [
+        "docker",
+        "version",
+        "--format",
+        "{{.Server.Version}}"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.032,
+      "log_path": "/tmp/fleetrelay-update-20260907/docker-version.log",
+      "log_sha256": "5f85edda8f72b8f1b6417b40eebff15208d46d9554b986b3f57469cadff5f743"
+    },
+    {
+      "name": "postgres-version",
+      "command": [
+        "psql",
+        "-X",
+        "postgres://fleetrelay:integration-only@127.0.0.1:15439/fleetrelay_test?sslmode=disable",
+        "-Atc",
+        "SHOW server_version"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.032,
+      "log_path": "/tmp/fleetrelay-update-20260907/postgres-version.log",
+      "log_sha256": "dfcec0c4d26211bbef0c709e8aa2c29c24e79f21ee886463eec81a39548db5ae"
+    },
+    {
+      "name": "redis-version",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "fleetrelay-review-20260907",
+        "-f",
+        "tests/integration/compose.yml",
+        "exec",
+        "-T",
+        "redis",
+        "redis-server",
+        "--version"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.114,
+      "log_path": "/tmp/fleetrelay-update-20260907/redis-version.log",
+      "log_sha256": "4c0dced1f61e69265641f4a4d9335417f23923564199e7711190553596044291"
+    },
+    {
+      "name": "go-race-final",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-coverprofile=/tmp/fleetrelay-update-20260907/coverage.out",
+        "-covermode=atomic",
+        "-json",
+        "./..."
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "log_path": "/tmp/fleetrelay-update-20260907/go-race-final.log",
+      "log_sha256": "6f5c6a90820cdc71b09880b95ef3e7e36c4606698873c3a9548fccc18e1d65d8",
+      "note": "Supersedes first 22-test run after adding completion-failure and real-process metrics checks."
+    }
+  ],
+  "go_tests": {
+    "counts": {
+      "pass": 23,
+      "fail": 0,
+      "skip": 0
+    },
+    "top_level_tests": {
+      "pass": [
+        "github.com/fleetrelay/fleetrelay/internal/relay:TestBoundedReliableAndCoalescedTelemetry",
+        "github.com/fleetrelay/fleetrelay/internal/controlhttp:TestInternalEndpointRequiresSharedToken",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestLeaseFencingAndIdempotentCommand",
+        "github.com/fleetrelay/fleetrelay/internal/controlhttp:TestReadinessFailsClosed",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestStaleSessionAndLateAckReconciliation",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestConcurrentLeaseHasSingleWinner",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestStateMachineProperty",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestFastAckIsAtomicAndBoundToAttempt",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestListDevicesReflectsPresence",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestAttemptAndDeliveryCommitTogether",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestUnpublishedAttemptSurvivesReopenWithoutBudgetConsumption",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestRedisPublicationFailureReusesDurableDelivery",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestConfirmationFailureDefersSameDelivery",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestConcurrentAttemptCreatorsHaveOneDurableIntent",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestOutboxMetricsIncludeDelayedRowsAndFailClosed",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestDeliveryFencesAndExpiry",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestOutboxRetrySurvivesReopenAndRejectsStaleFailure",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestOutboxRetryMigrationPreservesExistingRows",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestOutboxDeferralCancellationAndBounds",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestOutboxItemTimeoutDoesNotCancelNextRow",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestOutboxBatchMakesProgressPastPoisonRows",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestPublicationBackoffBounds",
+        "github.com/fleetrelay/fleetrelay/tests/integration:TestRealServicesDeliverCommandToSimulator"
+      ],
+      "fail": [],
+      "skip": []
+    }
+  },
+  "completed_at": "2026-09-07T22:38:25.740839+00:00",
+  "source_hashes": {
+    "cmd/control-api/main.go": "80514e19f61026c4b488e6f93b0ecb3d7cae5d802daf12626dbcb5b2c062b172",
+    "cmd/dispatcher/outbox.go": "edef32c50b14a07eafc891544c8bd4cc735ccb0d16369681f728a2f559bd4450",
+    "cmd/dispatcher/main.go": "8daa4e08a11aca8200693dc72fddce18c2dfcec987fde9296c4f8768dc06b1da",
+    "cmd/dispatcher/outbox_test.go": "c23d2b0ddbd7cc827aa22c3053e43822d75ace3ceb9cd62d56dc7940ab3646dc",
+    "cmd/dispatcher/outbox_progress_integration_test.go": "1368beab184c2e70fffb4dccee7c96c2b5f9653d3247679333fd874ac28ce5ef",
+    "cmd/dispatcher/delivery_integration_test.go": "08e23eb5e60fc99674289cbafca1a675a46b8acff7122a033843789959fac7cd",
+    "cmd/dispatcher/outbox_metrics_integration_test.go": "57c8e81793a6a402d3ae01dee1c76a245f0ca5defdcc4937f1f35119e2a12dc2",
+    "cmd/stream-gateway/main.go": "224dcb7a30f697e2ae6627b6e719f4ccee78966461ebc20dbcc9387ca776de11",
+    "cmd/device-sim/main.go": "7ba341a91a76d19c139ffac8ae4d6f24a7ed2ae9cf84650c9ae02d66a60d2a7a",
+    "internal/testutil/postgres.go": "ce34f4b8d69a85f276c6c6acabde6301509cd38b125a92a31ac053c2768b24e0",
+    "internal/relay/outbound_test.go": "469c8ca4e41961f33049a92d216f30556f1ca6b126dc0b5c3f37cbbf7a7c8b57",
+    "internal/relay/outbound.go": "9218d98cb2ead39d7a896a34751ba5d7f2ad13432efdb0f7e92eaac15ffe7f73",
+    "internal/relay/registry.go": "f410376466becc532b2435b51c0d7ea3e815dc8e27210b8cc2e935ef5d0c1a97",
+    "internal/controlhttp/server.go": "cd195bd803e713daec8c843a71a90ddeebb3dfab776e94b775d36b8c1ff732ab",
+    "internal/controlhttp/server_test.go": "73da9fbe33428aa4972d1120920e92e502a1872a143309eeec1a37dbb9df6e32",
+    "internal/control/service_test.go": "19d5f03451f79ff262f634b394ff66e2317e0cb2931ca64f37356b83480fe679",
+    "internal/control/model.go": "a021de52752c53d51ab799e66a6e4329a7db0b62063a4963ac3ad957be2e9d89",
+    "internal/control/service.go": "c71ad4b0ce52d36e3d8a47d74dc8dc11a34abc015f08b268025c59407cff1e4c",
+    "internal/control/store.go": "ef302523808d5c7c14882b99879651f9baf7290d8bff7c4f92b906f5413ab459",
+    "internal/control/postgres/outbox.go": "0868243e70a73aa6c86dc0d9525b877798574dfa6835c6cc2cc78dca48c289cd",
+    "internal/control/postgres/outbox_integration_test.go": "e155aee043eb730b7d338280cd095e3ab39749a1fbaf86f6f2cffca19c52f1fa",
+    "internal/control/postgres/store.go": "04d26d6f1c3ed104536cca3fb8aaa4ef7c41931480a0fda34667220ec95f5c58",
+    "internal/control/postgres/delivery_integration_test.go": "8cee237072f05543dc04b4c3e16221c4edb2bf8544b6c4fdb605c55a4a4f1df1",
+    "internal/control/memory/store.go": "c9dcafe476834ab59704dd95f4f2b9040bb247b717b102bcfa7066cb511b90ae",
+    "tests/e2e/docker-compose.override.yml": "ee92a8ff39f1d0d41357f8366b432eef79e57dfc6cab0692bc9330c89c0d61cc",
+    "tests/integration/compose.yml": "7d8d7a9b2d26432402a6dcef1a7dcca8b4c9439f9c88a35c374b8e4f6d5b7153",
+    "tests/integration/runtime_test.go": "abe6ede16299ee2a8794e34549c22fcb29e07f8f9334b07cd6d39e1236fb9c1d",
+    "tests/integration/migrations.sql": "f1701c314fd0f785461d4a4a601016627a09fb530235639a94b3759ef29cd74d",
+    "tests/e2e/wsprobe/main.go": "40332b3518cbe196daaeb2aafa235236bcd6adc70dbb8b93b49b2731a4fb4f17",
+    "migrations/000001_initial.down.sql": "93f8bbde98c3c95c188b9c512fd638eecb5de51120fe6660b0b03368d610f87f",
+    "migrations/apply.sql": "9c1739b7923c16737d81502e4ae57b1935c3648b34e9b15d6f04858cc8bb95aa",
+    "migrations/000002_outbox_retry.down.sql": "3fe5bd0cbaebacd14ed343f80d1596c688b487cb931553577d87c5bf474cccb0",
+    "migrations/000002_outbox_retry.up.sql": "6f74eb5a5a351108a1599b9a1d130878169a57011f0c60271721cbdbc76cc23b",
+    "migrations/000001_initial.up.sql": "42cad58128ff95f9d1fa0e5807b857506b4bc6d8399d966008e9060e490b3b17",
+    "deploy/observability/outbox-alerts.test.yml": "fa35acd5d1bd90f225c373e93707c837eda14b8bcb08bc2d7f3657df86ec2849",
+    "deploy/observability/otel-collector.yml": "71cd592fc1d6cfb407d9b6a7ced5c37cf726fbf7d2fafb40bbc182f8ebcb125f",
+    "deploy/observability/prometheus.yml": "2bf909df78f30d242aebf341259593ccd205c8b0f3d08cbb8f832967f1a92e8e",
+    "deploy/observability/alerts.yml": "045f36cb93ede2741c4df8ccc1ae7386904a754f13ed52560886f27f517ba781",
+    "deploy/observability/grafana/dashboards/command-delivery.json": "0e86cbce6af95a3d9094e43c1cf927738d1f45f810f2e4f608495f17b6776131",
+    "deploy/observability/grafana/dashboards/fleet-overview.json": "296204547bd79740a315f1d1d752383ca4d64572b6a43af8259da2751e862c92",
+    "deploy/observability/grafana/dashboards/connection-health.json": "745ab51e927a2e76506cf0511c5c4573beee9b300b858af46a587164e9ffa533",
+    "deploy/observability/grafana/dashboards/failure-injection.json": "b83093a67a04a688eb88922bbac78917fe1bb5133970569aca0b6d9c0d053848",
+    "deploy/observability/grafana/provisioning/dashboards/dashboards.yml": "8227dae98c58a44f9a355d73e839137109f18ea4eb2e0f799d8536ee398bfe25",
+    "deploy/observability/grafana/provisioning/datasources/prometheus.yml": "13ab124e3da250b609b7f0476d7716276436f9e7222640c6b4531d1ec245a6e5",
+    "deploy/compose/docker-compose.yml": "ddbb15530ab8978470ab63536d5a0b7e38092206d6f202189fb27a253e2064f3",
+    "go.mod": "022aad0c471c653df95fdc3399c9990d80378aa8d4b188663d7ecd618a455c99",
+    "go.sum": "199ab84f66f907409361aa8d3f0d613b4564925ecff0055a4c874ebfd9466ba3",
+    ".github/workflows/ci.yml": "05852f85410cc4974adf8d8ede915b390c61939a5eb0d4c245547739771d6ea5",
+    "scripts/test-integration.sh": "083d8f252ffaa5eee7af5052addcd47605b45b044cfe3dab901ba3fa957b24de"
+  },
+  "application_statement_coverage": {
+    "percent": 22.0,
+    "command": "go tool cover -func=/tmp/fleetrelay-update-20260907/coverage-app.out",
+    "filter": "Exclude /gen/ and /web/node_modules/ entries from full Go coverage profile; no other exclusions.",
+    "limitations": "Race-built service subprocesses are not coverage-instrumented and their execution is not counted; not end-to-end coverage. No baseline comparison."
+  },
+  "baseline": {
+    "kind": "starting_uncommitted_worktree_copy",
+    "base_commit": "84206e198423529c244ef4ac12072230a004e8df",
+    "source_manifest_sha256": "d93e0019be6b08b072dd771d295761225ef92da435cfd28a3e071b6d227ed4bb",
+    "harness": "Test-only mechanical extraction of starting Dispatcher loop into processOutboxBatch; baseline production logic unchanged.",
+    "harness_sha256": "13b0fd4b82d3f5156204180fe9480965bd9005e03c8c49dfa7d331e6af10b67f",
+    "regression_sha256": "1368beab184c2e70fffb4dccee7c96c2b5f9653d3247679333fd874ac28ce5ef",
+    "expected_failure": "healthy outbox row starved behind 64 poison rows after 3 batches",
+    "not_a_performance_baseline": true
+  },
+  "raw_archive": "/home/postedism/Desktop/Find work/jd-resume-tailor/backups/fleetrelay-retry-20260907T223825Z-60182fc3/verification",
+  "limitations": [
+    "Local uncommitted source; new code is not linked to old GitHub HEAD.",
+    "No production, cloud, hardware, throughput, latency or availability result.",
+    "No fresh application container build, hosted CI, live Grafana rendering or full Prometheus scrape loop.",
+    "No mixed-version rollout, physical network partition or process SIGKILL campaign.",
+    "Schema rollback and hooks/storage reopen are local controlled tests.",
+    "Go coverage excludes generated/vendored code and excludes runtime subprocess execution."
+  ]
+}

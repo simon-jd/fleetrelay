@@ -1,4 +1,4 @@
-.PHONY: all verify generate contract test test-race vet build web-check compose-config up down
+.PHONY: all verify generate contract test test-race test-integration vet build web-check compose-config up down
 
 all: contract test build
 
@@ -17,6 +17,9 @@ test:
 
 test-race:
 	go test -race ./...
+
+test-integration:
+	sh scripts/test-integration.sh
 
 vet:
 	go vet ./...

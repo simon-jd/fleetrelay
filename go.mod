@@ -1,6 +1,6 @@
 module github.com/fleetrelay/fleetrelay
 
-go 1.26
+go 1.26.8
 
 require (
 	github.com/coder/websocket v1.8.15

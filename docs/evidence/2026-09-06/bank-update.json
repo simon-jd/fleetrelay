@@ -1,0 +1,33 @@
+{
+  "updated_at": "2026-09-06T21:49:29.658477+00:00",
+  "project_id": "project-jdinseattle-fleetrelay",
+  "status": "written_reread_parsed_validated",
+  "bank_directory": "/home/postedism/Desktop/Find work/jd-resume-tailor/data",
+  "backup_directory": "/home/postedism/Desktop/Find work/jd-resume-tailor/.backups/fleetrelay-20260906T214929588096Z",
+  "lock": "/home/postedism/Desktop/Find work/jd-resume-tailor/.banks.lock",
+  "schema_version_preserved": "1.0",
+  "other_experiences_preserved": 6,
+  "other_evidence_records_preserved": 176,
+  "new_evidence_records": 13,
+  "new_metrics": 3,
+  "new_bullet_candidates": 4,
+  "new_interview_stories": 2,
+  "hashes_before": {
+    "experience_bank.json": "cfa7ac2fdff0bab4f15957c4bec118edff7998cc4c1b1edc5263c98fb5d4b76b",
+    "project_evidence_bank.json": "deb73048b98a57462ae3177f118d908ace7209dbdb1f65f148322234d2d759be"
+  },
+  "hashes_after": {
+    "experience_bank.json": "4dc5039307ebcc703f4744c44ebd9293b4523dde238475775496c272d5391fa9",
+    "project_evidence_bank.json": "6dcd0562908d7904932dc28c5e14fa0fb46b2f911fdf4b51c9df276b1c632ac7"
+  },
+  "rebased_since_staging": false,
+  "validation": {
+    "duplicate_ids": false,
+    "dangling_evidence_refs": false,
+    "dangling_metric_refs": false,
+    "missing_local_evidence": false,
+    "evidence_hashes_match": true,
+    "other_entries_unchanged": true
+  },
+  "atomicity": "Shared advisory lock, prewrite hash/stat checks and per-file atomic replace; two-file rollback on failure. Non-cooperating writers are not guaranteed exclusion."
+}

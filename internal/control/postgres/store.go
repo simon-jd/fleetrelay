@@ -404,6 +404,9 @@ func (s *Store) Acknowledge(ctx context.Context, ack control.Ack, now time.Time)
 }
 
 func (s *Store) CreateAttempt(ctx context.Context, id, gateway string, generation uint64, routed, deadline time.Time) (control.CommandAttempt, error) {
+	if !deadline.After(routed) {
+		return control.CommandAttempt{}, control.ErrInvalid
+	}
 	tx, err := s.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.Serializable})
 	if err != nil {
 		return control.CommandAttempt{}, err
@@ -449,6 +452,16 @@ func (s *Store) CreateAttempt(ctx context.Context, id, gateway string, generatio
 	if blocked {
 		return control.CommandAttempt{}, control.ErrConflict
 	}
+	// Publication retries must reuse the persisted intent, not consume another
+	// device attempt. The command row serializes this gate with attempt creation.
+	err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM outbox WHERE aggregate_id=$1::text AND kind='command.delivery' AND published_at IS NULL)
+		OR EXISTS(SELECT 1 FROM command_attempts WHERE command_id=$1::uuid AND attempt_deadline>$2)`, id, routed).Scan(&blocked)
+	if err != nil {
+		return control.CommandAttempt{}, err
+	}
+	if blocked {
+		return control.CommandAttempt{}, control.ErrConflict
+	}
 	var n uint32
 	err = tx.QueryRow(ctx, `SELECT COALESCE(MAX(attempt),0)+1 FROM command_attempts WHERE command_id=$1`, id).Scan(&n)
 	if err != nil {
@@ -459,6 +472,14 @@ func (s *Store) CreateAttempt(ctx context.Context, id, gateway string, generatio
 		return control.CommandAttempt{}, err
 	}
 	a := control.CommandAttempt{CommandID: id, Attempt: n, TargetGatewayID: gateway, TargetSessionGeneration: generation, RoutedAt: routed, Deadline: deadline}
+	if err = putOutbox(ctx, tx, "command.delivery", id, control.Delivery{Command: c, Attempt: a}, fmt.Sprintf("delivery:%s:%d", id, n), routed); err != nil {
+		return control.CommandAttempt{}, err
+	}
+	// Consuming command.created and persisting the first recoverable delivery
+	// are one commit, including when the caller loses the commit response.
+	if _, err = tx.Exec(ctx, `UPDATE outbox SET published_at=$2 WHERE aggregate_id=$1 AND kind='command.created' AND published_at IS NULL`, id, routed); err != nil {
+		return control.CommandAttempt{}, err
+	}
 	return a, tx.Commit(ctx)
 }
 
@@ -476,6 +497,13 @@ func (s *Store) PrepareOutboxCommand(ctx context.Context, id string, now time.Ti
 		return c, false, err
 	}
 	if c.Status != control.StatusPendingTransport {
+		return c, true, nil
+	}
+	var attempted bool
+	if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM command_attempts WHERE command_id=$1)`, id).Scan(&attempted); err != nil {
+		return c, false, err
+	}
+	if attempted {
 		return c, true, nil
 	}
 	if _, err = tx.Exec(ctx, `SELECT pg_advisory_xact_lock(hashtext($1))`, c.DeviceID); err != nil {
@@ -510,7 +538,9 @@ func (s *Store) PrepareOutboxCommand(ctx context.Context, id string, now time.Ti
 func (s *Store) ListRetryCandidates(ctx context.Context, now time.Time, limit int) ([]control.RetryCandidate, error) {
 	rows, err := s.pool.Query(ctx, `SELECT `+retryCols+`,a.attempt,a.target_gateway_id,a.target_session_generation,a.routed_at,a.attempt_deadline,(SELECT COUNT(*) FROM command_attempts x WHERE x.command_id=c.command_id)
 		FROM commands c JOIN LATERAL (SELECT * FROM command_attempts WHERE command_id=c.command_id ORDER BY attempt DESC LIMIT 1) a ON true
-		WHERE c.status IN ('PENDING_TRANSPORT','DISPATCHED') AND a.attempt_deadline<=$1 ORDER BY a.attempt_deadline LIMIT $2`, now, limit)
+		WHERE c.status IN ('PENDING_TRANSPORT','DISPATCHED') AND a.attempt_deadline<=$1
+		AND (c.expires_at<=$1 OR NOT EXISTS(SELECT 1 FROM outbox o WHERE o.business_key='delivery:'||c.command_id||':'||a.attempt AND o.published_at IS NULL))
+		ORDER BY a.attempt_deadline LIMIT $2`, now, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -547,6 +577,16 @@ func (s *Store) ResolveAttemptDeadline(ctx context.Context, id string, max uint3
 	if err = tx.QueryRow(ctx, `SELECT COUNT(*) FROM command_attempts WHERE command_id=$1`, id).Scan(&attempts); err != nil {
 		return c, false, err
 	}
+	if c.ExpiresAt.After(now) {
+		var waiting bool
+		if err = tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM command_attempts WHERE command_id=$1::uuid AND attempt_deadline>$2)
+			OR EXISTS(SELECT 1 FROM outbox WHERE aggregate_id=$1::text AND kind='command.delivery' AND published_at IS NULL)`, id, now).Scan(&waiting); err != nil {
+			return c, false, err
+		}
+		if waiting {
+			return c, false, nil
+		}
+	}
 	to := control.CommandStatus("")
 	if c.Status == control.StatusPendingTransport && !c.ExpiresAt.After(now) {
 		to = control.StatusExpired
@@ -571,7 +611,10 @@ func (s *Store) ResolveAttemptDeadline(ctx context.Context, id string, max uint3
 	return c, true, tx.Commit(ctx)
 }
 func (s *Store) ClaimOutbox(ctx context.Context, limit int) ([]control.OutboxItem, error) {
-	rows, e := s.pool.Query(ctx, `SELECT outbox_id,aggregate_id,kind,payload,created_at FROM outbox WHERE published_at IS NULL ORDER BY created_at LIMIT $1`, limit)
+	// Historical name: this is a due-work read, not a durable multi-worker claim.
+	rows, e := s.pool.Query(ctx, `SELECT outbox_id,aggregate_id,kind,payload,created_at,publication_failures
+		FROM outbox WHERE published_at IS NULL AND next_publish_at <= statement_timestamp()
+		ORDER BY next_publish_at,created_at,outbox_id LIMIT $1`, limit)
 	if e != nil {
 		return nil, e
 	}
@@ -579,7 +622,7 @@ func (s *Store) ClaimOutbox(ctx context.Context, limit int) ([]control.OutboxIte
 	var out []control.OutboxItem
 	for rows.Next() {
 		var i control.OutboxItem
-		if e = rows.Scan(&i.ID, &i.AggregateID, &i.Kind, &i.Payload, &i.CreatedAt); e != nil {
+		if e = rows.Scan(&i.ID, &i.AggregateID, &i.Kind, &i.Payload, &i.CreatedAt, &i.PublicationFailures); e != nil {
 			return nil, e
 		}
 		out = append(out, i)
@@ -587,18 +630,56 @@ func (s *Store) ClaimOutbox(ctx context.Context, limit int) ([]control.OutboxIte
 	return out, rows.Err()
 }
 func (s *Store) MarkOutboxPublished(ctx context.Context, id string, now time.Time) error {
-	tag, e := s.pool.Exec(ctx, `UPDATE outbox SET published_at=$2 WHERE outbox_id=$1 AND published_at IS NULL`, id, now)
-	if e == nil && tag.RowsAffected() == 0 {
+	// Set the ACK deadline once, at confirmed publication. A slow/unavailable
+	// Redis must not exhaust the device ACK window before transport succeeds.
+	tx, e := s.pool.Begin(ctx)
+	if e != nil {
+		return e
+	}
+	defer tx.Rollback(ctx)
+	var kind string
+	var payload []byte
+	e = tx.QueryRow(ctx, `UPDATE outbox SET published_at=$2 WHERE outbox_id=$1 AND published_at IS NULL RETURNING kind,payload`, id, now).Scan(&kind, &payload)
+	if errors.Is(e, pgx.ErrNoRows) {
 		return control.ErrNotFound
 	}
-	return e
+	if e != nil {
+		return e
+	}
+	if kind == "command.delivery" {
+		var d control.Delivery
+		if e = json.Unmarshal(payload, &d); e != nil {
+			return e
+		}
+		if _, e = tx.Exec(ctx, `UPDATE command_attempts SET attempt_deadline=$3 WHERE command_id=$1 AND attempt=$2`, d.Command.ID, d.Attempt.Attempt, now.Add(d.Attempt.Deadline.Sub(d.Attempt.RoutedAt))); e != nil {
+			return e
+		}
+	}
+	return tx.Commit(ctx)
+}
+
+// DeliveryCurrent retires obsolete intents before publication. This is a
+// preflight, not a dispatch permit: Gateway/device fencing is still required.
+func (s *Store) DeliveryCurrent(ctx context.Context, d control.Delivery, now time.Time) (bool, error) {
+	var valid bool
+	err := s.pool.QueryRow(ctx, `SELECT EXISTS(
+		SELECT 1 FROM commands c JOIN command_attempts a ON a.command_id=c.command_id
+		JOIN control_leases l ON l.lease_id=c.lease_id
+		WHERE c.command_id=$1 AND a.attempt=$2 AND a.target_gateway_id=$3 AND a.target_session_generation=$4
+		AND c.status IN ('PENDING_TRANSPORT','DISPATCHED') AND c.expires_at>$5
+		AND l.status='ACTIVE' AND l.expires_at>$5 AND l.lease_epoch=c.lease_epoch
+		AND a.attempt=(SELECT MAX(attempt) FROM command_attempts WHERE command_id=c.command_id)
+		AND EXISTS(SELECT 1 FROM device_sessions s WHERE s.device_id=c.device_id AND s.gateway_id=$3 AND s.session_generation=$4
+		AND s.session_generation=(SELECT MAX(session_generation) FROM device_sessions WHERE device_id=c.device_id))
+	)`, d.Command.ID, d.Attempt.Attempt, d.Attempt.TargetGatewayID, d.Attempt.TargetSessionGeneration, now).Scan(&valid)
+	return valid, err
 }
 func putOutbox(ctx context.Context, tx pgx.Tx, kind, aggregate string, value any, key string, now time.Time) error {
 	b, e := json.Marshal(value)
 	if e != nil {
 		return e
 	}
-	_, e = tx.Exec(ctx, `INSERT INTO outbox(aggregate_id,kind,payload,business_key,created_at) VALUES($1,$2,$3,$4,$5) ON CONFLICT(business_key) DO NOTHING`, aggregate, kind, b, key, now)
+	_, e = tx.Exec(ctx, `INSERT INTO outbox(aggregate_id,kind,payload,business_key,created_at,next_publish_at) VALUES($1,$2,$3,$4,$5,$5) ON CONFLICT(business_key) DO NOTHING`, aggregate, kind, b, key, now)
 	return e
 }
 func mapFK(err error) error {

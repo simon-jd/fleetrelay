@@ -20,6 +20,9 @@
 | [ADR-014](014-transaction-claims-and-crash-boundaries.md) | command_work、attempt、delivery_outbox、authorization、claim 和 crash 后置条件 | Proposed；Phase 0 exit 前 Accepted |
 | [ADR-015](015-durable-event-replay.md) | Domain event、snapshot-watermark、cursor 和 replay/live 顺序算法 | Proposed；Phase 0 exit 前 Accepted |
 | [ADR-016](016-device-execution-journal.md) | Device execution journal、fingerprint、operation token、UNKNOWN 和 GC | Proposed；Phase 0 exit 前 Accepted |
+| [ADR-017](017-prototype-delivery-intents.md) | 原型 attempt + delivery intent 原子提交与稳定 ID 重发 | Accepted（仅原型范围）；ADR-014 生产 claim/permit 仍 Proposed |
+| [ADR-018](018-outbox-retry-isolation.md) | 原型 outbox 持久退避、超时隔离、指标及迁移 | Accepted（仅原型范围） |
+| [ADR-019](019-local-docker-recovery-and-bounded-dispatch.md) | Docker 故障证据、模拟器持久结果记录及有界 outbox 跟进发布 | Accepted（仅原型/模拟器范围） |
 
 ## 新 ADR 模板
 

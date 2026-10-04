@@ -1,3 +1,5 @@
+> Latest local verification: [2026-09-07 outbox retry isolation](2026-09-07/report.md). Earlier dated sections below retain their historical scope.
+
 # FleetRelay prototype validation report
 
 Validated on 2026-09-01 by separate implementation, review, and test agents. This report records feasibility evidence for the local vertical slice. It is not a production certification and does not upgrade the repository to “V1 complete.”
@@ -79,3 +81,18 @@ Independent review originally found blocking contract, ACK-validation, consumer 
 - a production-grade retry scheduler with atomic work claims and richer device execution reconciliation.
 
 The supported claim for this repository is: **a runnable and independently exercised FleetRelay distributed control-plane prototype that demonstrates the proposed command lifecycle and a bounded failover path on a local Compose topology.**
+
+## 2026-09-06 follow-up
+
+The original report above remains historical evidence. Atomic attempt/delivery intents, stable-ID Redis republication, real dependency integration tests, and a new simulator smoke path were subsequently implemented and executed. See the [current report](2026-09-06/report.md) for raw logs and limits. Production claims/permits, durable browser replay, security, device journals and measured load targets remain open.
+
+## 2026-09-07 Docker follow-up
+
+The [new report](2026-09-07-docker/report.md) supersedes current-state statements
+about the simulator being in-process-only and the absence of measured latency
+or live monitoring evidence. The simulator now supports an optional durable
+result journal; the lab executes real container failures, logical backup restore,
+Prometheus scrapes/down-alert evaluation and paired baseline/candidate latency
+runs. Historical results above retain their original scope. Physical actuator
+idempotency, real cloud/production deployment, broad load targets and complete
+production gates remain unverified.

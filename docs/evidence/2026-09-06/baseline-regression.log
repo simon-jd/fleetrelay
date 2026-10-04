@@ -1,0 +1,6 @@
+=== RUN   TestAttemptAndDeliveryCommitTogether
+    atomicity_regression_test.go:17: attempt committed without its delivery intent
+--- FAIL: TestAttemptAndDeliveryCommitTogether (0.11s)
+FAIL
+FAIL	github.com/fleetrelay/fleetrelay/internal/control/postgres	0.116s
+FAIL

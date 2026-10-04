@@ -68,7 +68,8 @@ func main() {
 		<-leadershipDone
 		releaseLeadership()
 	}()
-	rdb := redis.NewClient(&redis.Options{Addr: env("REDIS_ADDR", "redis:6379")})
+	rdb := redis.NewClient(dispatcherRedisOptions(env("REDIS_ADDR", "redis:6379")))
+	defer rdb.Close()
 	srv := &http.Server{Addr: env("METRICS_ADDR", ":8082"), Handler: dispatcherHTTP(db, rdb)}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -92,20 +93,8 @@ func main() {
 			return
 		case <-ticker.C:
 			batchCtx, stop := context.WithTimeout(ctx, 15*time.Second)
-			items, e := db.ClaimOutbox(batchCtx, 64)
-			if e != nil {
-				log.Warn("claim outbox", "error", e)
-				stop()
-				continue
-			}
-			for _, item := range items {
-				if e = publish(batchCtx, db, rdb, item); e != nil {
-					log.Warn("publish outbox", "outbox_id", item.ID, "error", e)
-					continue
-				}
-				if e = db.MarkOutboxPublished(batchCtx, item.ID, time.Now()); e != nil && !errors.Is(e, control.ErrNotFound) {
-					log.Warn("mark published", "error", e)
-				}
+			if err := processOutboxBatch(batchCtx, db, rdb, log); err != nil {
+				log.Warn("process outbox", "error", err)
 			}
 			stop()
 		case <-retryTicker.C:
@@ -125,13 +114,28 @@ func dispatcherHTTP(db *postgres.Store, rdb *redis.Client) http.Handler {
 		}
 		w.Write([]byte(`{"status":"ok"}`))
 	})
-	m.HandleFunc("GET /metrics", func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set("Content-Type", "text/plain; version=0.0.4")
-		w.Write([]byte("fleetrelay_up 1\n"))
-	})
+	m.HandleFunc("GET /metrics", outboxMetrics(db))
 	return m
 }
 func publish(ctx context.Context, db *postgres.Store, rdb *redis.Client, item control.OutboxItem) error {
+	if item.Kind == "command.delivery" {
+		var d control.Delivery
+		if err := json.Unmarshal(item.Payload, &d); err != nil {
+			return err
+		}
+		valid, err := db.DeliveryCurrent(ctx, d, time.Now())
+		if err != nil || !valid {
+			return err // nil retires an obsolete intent without sending it.
+		}
+		payload, err := json.Marshal(d.Command)
+		if err != nil {
+			return err
+		}
+		return rdb.XAdd(ctx, &redis.XAddArgs{Stream: "relay:gateway:" + d.Attempt.TargetGatewayID + ":commands", Values: map[string]any{
+			"delivery_id": item.ID, "attempt": d.Attempt.Attempt,
+			"command_id": d.Command.ID, "command": string(payload), "generation": d.Attempt.TargetSessionGeneration,
+		}}).Err()
+	}
 	if item.Kind != "command.created" {
 		return rdb.XAdd(ctx, &redis.XAddArgs{Stream: "relay:fleet:events", MaxLen: 10000, Approx: true, Values: map[string]any{"event_id": item.ID, "kind": item.Kind, "payload": string(item.Payload)}}).Err()
 	}
@@ -153,10 +157,9 @@ func publish(ctx context.Context, db *postgres.Store, rdb *redis.Client, item co
 	if e = requireGatewayAlive(ctx, rdb, p.GatewayID, p.GatewayInstance); e != nil {
 		return e
 	}
-	if _, e = db.CreateAttempt(ctx, c.ID, p.GatewayID, p.Generation, time.Now(), time.Now().Add(3*time.Second)); e != nil {
-		return e
-	}
-	return rdb.XAdd(ctx, &redis.XAddArgs{Stream: "relay:gateway:" + p.GatewayID + ":commands", Values: map[string]any{"command_id": c.ID, "command": string(item.Payload), "generation": p.Generation}}).Err()
+	now := time.Now()
+	_, e = db.CreateAttempt(ctx, c.ID, p.GatewayID, p.Generation, now, now.Add(3*time.Second))
+	return e
 }
 func retryDeadlines(ctx context.Context, db *postgres.Store, rdb *redis.Client, log *slog.Logger, max uint32) {
 	items, err := db.ListRetryCandidates(ctx, time.Now(), 64)
@@ -192,10 +195,8 @@ func retryDeadlines(ctx context.Context, db *postgres.Store, rdb *redis.Client, 
 			log.Warn("create retry attempt", "command_id", item.Command.ID, "error", e)
 			continue
 		}
-		payload, _ := json.Marshal(item.Command)
-		if e = rdb.XAdd(ctx, &redis.XAddArgs{Stream: "relay:gateway:" + p.GatewayID + ":commands", Values: map[string]any{"command_id": item.Command.ID, "command": string(payload), "generation": p.Generation}}).Err(); e != nil {
-			log.Warn("publish retry attempt", "command_id", item.Command.ID, "error", e)
-		}
+		// The outbox loop publishes the committed intent. Redis publication
+		// failures never create another device attempt here.
 	}
 }
 

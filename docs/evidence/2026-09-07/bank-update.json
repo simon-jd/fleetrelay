@@ -1,0 +1,27 @@
+{
+  "project_id": "project-jdinseattle-fleetrelay",
+  "mode": "write",
+  "bank_paths": [
+    "/home/postedism/Desktop/Find work/jd-resume-tailor/data/experience_bank.json",
+    "/home/postedism/Desktop/Find work/jd-resume-tailor/data/project_evidence_bank.json"
+  ],
+  "before_sha256": {
+    "experience_bank.json": "54601442e9df22e4d49317e91bf3f6dfbebca09b490940a711ef2996984e7e50",
+    "project_evidence_bank.json": "5297e1ed5d0950ee1dff9b8e517a0e9f205a40032335709b8e23d72227f4e9b0"
+  },
+  "global_validation_errors": [],
+  "baseline_validation_errors": [],
+  "unrelated_records_preserved": true,
+  "new_evidence": 12,
+  "new_metrics": 3,
+  "new_bullet_candidates": 2,
+  "new_stories": 2,
+  "backup_path": "/home/postedism/Desktop/Find work/jd-resume-tailor/backups/fleetrelay-retry-20260907T223825Z-60182fc3",
+  "concurrent_other_project_updates_merged": true,
+  "after_sha256": {
+    "experience_bank.json": "8f033f2babf2c53cc5873844bdaa386e63a86024109601456105406f27a840cd",
+    "project_evidence_bank.json": "abe24099969c0a31edf4195f3e24c76e3ee5e4b9519b7c42fa0f6fc8d1b33603"
+  },
+  "status": "written_reread_parsed_validated",
+  "raw_archive_sha256": "9b3b0d65b04100dc6d5c83e0307badea66ac919772e938d5620657bf33207fd3"
+}

@@ -27,6 +27,41 @@ jobs:
       - run: go test -race -count=1 ./...
       - run: go build ./cmd/...
 
+  integration:
+    name: PostgreSQL and Redis delivery boundaries
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17.6-alpine
+        env:
+          POSTGRES_USER: fleetrelay
+          POSTGRES_PASSWORD: integration-only
+          POSTGRES_DB: fleetrelay_test
+        ports: ["15439:5432"]
+        options: >-
+          --health-cmd "pg_isready -U fleetrelay -d fleetrelay_test"
+          --health-interval 1s --health-timeout 3s --health-retries 30
+      redis:
+        image: redis:8.2-alpine
+        ports: ["16389:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 1s --health-timeout 3s --health-retries 30
+    env:
+      FLEETRELAY_REQUIRE_INTEGRATION: "1"
+      FLEETRELAY_TEST_DATABASE_URL: postgres://fleetrelay:integration-only@127.0.0.1:15439/fleetrelay_test?sslmode=disable
+      FLEETRELAY_TEST_REDIS_ADDR: 127.0.0.1:16389
+      FLEETRELAY_TEST_BIN_DIR: /tmp/fleetrelay-integration-bin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - run: go build -race -o /tmp/fleetrelay-integration-bin/ ./cmd/...
+      - run: psql -X "$FLEETRELAY_TEST_DATABASE_URL" --set ON_ERROR_STOP=1 --file tests/integration/migrations.sql
+      - run: go test -race -count=1 -v ./internal/control/postgres ./cmd/dispatcher ./tests/integration
+
   contract:
     name: Protobuf contract
     runs-on: ubuntu-latest
@@ -75,17 +110,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: docker compose --env-file deploy/compose/.env.example -f deploy/compose/docker-compose.yml config --quiet
+      - run: docker compose -f tests/docker/compose.yml config --quiet
+      - run: python3 -m py_compile scripts/build-docker-lab.py scripts/verify-docker-lab.py
       - name: Validate observability JSON
         run: |
           python3 -m json.tool deploy/observability/grafana/dashboards/fleet-overview.json >/dev/null
           python3 -m json.tool deploy/observability/grafana/dashboards/command-delivery.json >/dev/null
           python3 -m json.tool deploy/observability/grafana/dashboards/connection-health.json >/dev/null
           python3 -m json.tool deploy/observability/grafana/dashboards/failure-injection.json >/dev/null
+      - name: Test outbox alert rules
+        run: docker run --rm --network none --entrypoint /bin/promtool -v "$PWD/deploy/observability:/rules:ro" prom/prometheus:v3.6.0 test rules /rules/outbox-alerts.test.yml
 
   images:
     name: Build ${{ matrix.service }} image
     runs-on: ubuntu-latest
-    needs: [go, contract, web, compose]
+    needs: [go, integration, contract, web, compose]
     strategy:
       fail-fast: false
       matrix:

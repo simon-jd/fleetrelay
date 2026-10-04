@@ -1,0 +1,44 @@
+rule_files:
+  - alerts.yml
+evaluation_interval: 10s
+tests:
+  - interval: 10s
+    input_series:
+      - series: 'outbox_oldest_unpublished_seconds{job="dispatcher",instance="dispatcher:8082"}'
+        values: '45+0x40'
+      - series: 'fleetrelay_outbox_retry_waiting{job="dispatcher",instance="dispatcher:8082"}'
+        values: '64+0x40'
+    alert_rule_test:
+      - eval_time: 70s
+        alertname: FleetRelayOutboxBacklog
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: dispatcher
+              instance: dispatcher:8082
+            exp_annotations:
+              summary: FleetRelay outbox has been delayed
+              description: The oldest unpublished outbox item is 45s old.
+      - eval_time: 310s
+        alertname: FleetRelayOutboxRetryWaiting
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: dispatcher
+              instance: dispatcher:8082
+            exp_annotations:
+              summary: FleetRelay outbox retries remain delayed
+              description: Inspect Dispatcher logs and pending outbox retry times; do not delete delivery intents.
+  - interval: 10s
+    input_series:
+      - series: 'outbox_oldest_unpublished_seconds{job="dispatcher",instance="dispatcher:8082"}'
+        values: '0+0x40'
+      - series: 'fleetrelay_outbox_retry_waiting{job="dispatcher",instance="dispatcher:8082"}'
+        values: '0+0x40'
+    alert_rule_test:
+      - eval_time: 310s
+        alertname: FleetRelayOutboxBacklog
+        exp_alerts: []
+      - eval_time: 310s
+        alertname: FleetRelayOutboxRetryWaiting
+        exp_alerts: []

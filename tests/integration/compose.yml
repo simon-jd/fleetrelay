@@ -1,0 +1,24 @@
+name: fleetrelay-integration
+services:
+  postgres:
+    image: postgres:17.6-alpine
+    environment:
+      POSTGRES_USER: fleetrelay
+      POSTGRES_PASSWORD: integration-only
+      POSTGRES_DB: fleetrelay_test
+    ports: ["127.0.0.1:15439:5432"]
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U fleetrelay -d fleetrelay_test"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+  redis:
+    image: redis:8.2-alpine
+    ports: ["127.0.0.1:16389:6379"]
+    command: [redis-server, --save, "", --appendonly, "no"]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 1s
+      timeout: 3s
+      retries: 30

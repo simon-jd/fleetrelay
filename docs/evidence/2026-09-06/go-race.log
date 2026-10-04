@@ -1,0 +1,133 @@
+{"Time":"2026-09-06T14:38:23.028000885-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/cmd/control-api"}
+{"Time":"2026-09-06T14:38:23.028118529-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/cmd/device-sim"}
+{"Time":"2026-09-06T14:38:23.02813364-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/device-sim","Output":"?   \tgithub.com/fleetrelay/fleetrelay/cmd/device-sim\t[no test files]\n"}
+{"Time":"2026-09-06T14:38:23.028150995-07:00","Action":"skip","Package":"github.com/fleetrelay/fleetrelay/cmd/device-sim","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.028156883-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/control-api","Output":"?   \tgithub.com/fleetrelay/fleetrelay/cmd/control-api\t[no test files]\n"}
+{"Time":"2026-09-06T14:38:23.028160787-07:00","Action":"skip","Package":"github.com/fleetrelay/fleetrelay/cmd/control-api","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.396098617-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher"}
+{"Time":"2026-09-06T14:38:23.396173688-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/cmd/stream-gateway"}
+{"Time":"2026-09-06T14:38:23.396196806-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/stream-gateway","Output":"?   \tgithub.com/fleetrelay/fleetrelay/cmd/stream-gateway\t[no test files]\n"}
+{"Time":"2026-09-06T14:38:23.396202892-07:00","Action":"skip","Package":"github.com/fleetrelay/fleetrelay/cmd/stream-gateway","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.396209633-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/gen/fleetrelay/v1"}
+{"Time":"2026-09-06T14:38:23.396217365-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/gen/fleetrelay/v1","Output":"?   \tgithub.com/fleetrelay/fleetrelay/gen/fleetrelay/v1\t[no test files]\n"}
+{"Time":"2026-09-06T14:38:23.396219577-07:00","Action":"skip","Package":"github.com/fleetrelay/fleetrelay/gen/fleetrelay/v1","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.396222714-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/internal/control"}
+{"Time":"2026-09-06T14:38:23.396336952-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/internal/control/memory"}
+{"Time":"2026-09-06T14:38:23.396352268-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/memory","Output":"?   \tgithub.com/fleetrelay/fleetrelay/internal/control/memory\t[no test files]\n"}
+{"Time":"2026-09-06T14:38:23.396357416-07:00","Action":"skip","Package":"github.com/fleetrelay/fleetrelay/internal/control/memory","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.396363846-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres"}
+{"Time":"2026-09-06T14:38:23.396400753-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp"}
+{"Time":"2026-09-06T14:38:23.396481074-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/internal/relay"}
+{"Time":"2026-09-06T14:38:23.396512883-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/internal/testutil"}
+{"Time":"2026-09-06T14:38:23.396522319-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/testutil","Output":"?   \tgithub.com/fleetrelay/fleetrelay/internal/testutil\t[no test files]\n"}
+{"Time":"2026-09-06T14:38:23.396525006-07:00","Action":"skip","Package":"github.com/fleetrelay/fleetrelay/internal/testutil","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.396527515-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/tests/e2e/wsprobe"}
+{"Time":"2026-09-06T14:38:23.39652917-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/tests/e2e/wsprobe","Output":"?   \tgithub.com/fleetrelay/fleetrelay/tests/e2e/wsprobe\t[no test files]\n"}
+{"Time":"2026-09-06T14:38:23.396530967-07:00","Action":"skip","Package":"github.com/fleetrelay/fleetrelay/tests/e2e/wsprobe","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.396533983-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/tests/integration"}
+{"Time":"2026-09-06T14:38:23.396646975-07:00","Action":"start","Package":"github.com/fleetrelay/fleetrelay/web/node_modules/flatted/golang/pkg/flatted"}
+{"Time":"2026-09-06T14:38:23.396657829-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/web/node_modules/flatted/golang/pkg/flatted","Output":"?   \tgithub.com/fleetrelay/fleetrelay/web/node_modules/flatted/golang/pkg/flatted\t[no test files]\n"}
+{"Time":"2026-09-06T14:38:23.39666339-07:00","Action":"skip","Package":"github.com/fleetrelay/fleetrelay/web/node_modules/flatted/golang/pkg/flatted","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.403688948-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestLeaseFencingAndIdempotentCommand"}
+{"Time":"2026-09-06T14:38:23.403715865-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestLeaseFencingAndIdempotentCommand","Output":"=== RUN   TestLeaseFencingAndIdempotentCommand\n"}
+{"Time":"2026-09-06T14:38:23.404325135-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestLeaseFencingAndIdempotentCommand","Output":"--- PASS: TestLeaseFencingAndIdempotentCommand (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.404359781-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestLeaseFencingAndIdempotentCommand","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.404384746-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestStaleSessionAndLateAckReconciliation"}
+{"Time":"2026-09-06T14:38:23.404386701-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestStaleSessionAndLateAckReconciliation","Output":"=== RUN   TestStaleSessionAndLateAckReconciliation\n"}
+{"Time":"2026-09-06T14:38:23.404549788-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/tests/integration","Test":"TestRealServicesDeliverCommandToSimulator"}
+{"Time":"2026-09-06T14:38:23.404552147-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/tests/integration","Test":"TestRealServicesDeliverCommandToSimulator","Output":"=== RUN   TestRealServicesDeliverCommandToSimulator\n"}
+{"Time":"2026-09-06T14:38:23.404734184-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestStaleSessionAndLateAckReconciliation","Output":"--- PASS: TestStaleSessionAndLateAckReconciliation (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.404745438-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestStaleSessionAndLateAckReconciliation","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.404749276-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestConcurrentLeaseHasSingleWinner"}
+{"Time":"2026-09-06T14:38:23.4047515-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestConcurrentLeaseHasSingleWinner","Output":"=== RUN   TestConcurrentLeaseHasSingleWinner\n"}
+{"Time":"2026-09-06T14:38:23.404888526-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestConcurrentLeaseHasSingleWinner","Output":"--- PASS: TestConcurrentLeaseHasSingleWinner (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.404898359-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestConcurrentLeaseHasSingleWinner","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.404908827-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestStateMachineProperty"}
+{"Time":"2026-09-06T14:38:23.404911729-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestStateMachineProperty","Output":"=== RUN   TestStateMachineProperty\n"}
+{"Time":"2026-09-06T14:38:23.404950635-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestStateMachineProperty","Output":"--- PASS: TestStateMachineProperty (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.404959472-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestStateMachineProperty","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.404970505-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestFastAckIsAtomicAndBoundToAttempt"}
+{"Time":"2026-09-06T14:38:23.404972346-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestFastAckIsAtomicAndBoundToAttempt","Output":"=== RUN   TestFastAckIsAtomicAndBoundToAttempt\n"}
+{"Time":"2026-09-06T14:38:23.405170005-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestFastAckIsAtomicAndBoundToAttempt","Output":"--- PASS: TestFastAckIsAtomicAndBoundToAttempt (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.405178889-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestFastAckIsAtomicAndBoundToAttempt","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.405189821-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestListDevicesReflectsPresence"}
+{"Time":"2026-09-06T14:38:23.405191617-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestListDevicesReflectsPresence","Output":"=== RUN   TestListDevicesReflectsPresence\n"}
+{"Time":"2026-09-06T14:38:23.405242527-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestListDevicesReflectsPresence","Output":"--- PASS: TestListDevicesReflectsPresence (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.405252931-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control","Test":"TestListDevicesReflectsPresence","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.405268436-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Output":"PASS\n"}
+{"Time":"2026-09-06T14:38:23.406632024-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Test":"TestInternalEndpointRequiresSharedToken"}
+{"Time":"2026-09-06T14:38:23.406638591-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Test":"TestInternalEndpointRequiresSharedToken","Output":"=== RUN   TestInternalEndpointRequiresSharedToken\n"}
+{"Time":"2026-09-06T14:38:23.406846974-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Test":"TestInternalEndpointRequiresSharedToken","Output":"--- PASS: TestInternalEndpointRequiresSharedToken (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.406857392-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Test":"TestInternalEndpointRequiresSharedToken","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.406869682-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Test":"TestReadinessFailsClosed"}
+{"Time":"2026-09-06T14:38:23.406871225-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Test":"TestReadinessFailsClosed","Output":"=== RUN   TestReadinessFailsClosed\n"}
+{"Time":"2026-09-06T14:38:23.406973075-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Test":"TestReadinessFailsClosed","Output":"--- PASS: TestReadinessFailsClosed (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.406979542-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Test":"TestReadinessFailsClosed","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.406983657-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Output":"PASS\n"}
+{"Time":"2026-09-06T14:38:23.407913611-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery"}
+{"Time":"2026-09-06T14:38:23.407922014-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery","Output":"=== RUN   TestRedisPublicationFailureReusesDurableDelivery\n"}
+{"Time":"2026-09-06T14:38:23.407943832-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery/before_xadd"}
+{"Time":"2026-09-06T14:38:23.4079464-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery/before_xadd","Output":"=== RUN   TestRedisPublicationFailureReusesDurableDelivery/before_xadd\n"}
+{"Time":"2026-09-06T14:38:23.408020311-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestAttemptAndDeliveryCommitTogether"}
+{"Time":"2026-09-06T14:38:23.408027887-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestAttemptAndDeliveryCommitTogether","Output":"=== RUN   TestAttemptAndDeliveryCommitTogether\n"}
+{"Time":"2026-09-06T14:38:23.4090022-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/relay","Test":"TestBoundedReliableAndCoalescedTelemetry"}
+{"Time":"2026-09-06T14:38:23.409008133-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/relay","Test":"TestBoundedReliableAndCoalescedTelemetry","Output":"=== RUN   TestBoundedReliableAndCoalescedTelemetry\n"}
+{"Time":"2026-09-06T14:38:23.409069927-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/relay","Test":"TestBoundedReliableAndCoalescedTelemetry","Output":"--- PASS: TestBoundedReliableAndCoalescedTelemetry (0.00s)\n"}
+{"Time":"2026-09-06T14:38:23.409090047-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/relay","Test":"TestBoundedReliableAndCoalescedTelemetry","Elapsed":0}
+{"Time":"2026-09-06T14:38:23.409107595-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/relay","Output":"PASS\n"}
+{"Time":"2026-09-06T14:38:23.487953122-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestAttemptAndDeliveryCommitTogether","Output":"--- PASS: TestAttemptAndDeliveryCommitTogether (0.08s)\n"}
+{"Time":"2026-09-06T14:38:23.487968731-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestAttemptAndDeliveryCommitTogether","Elapsed":0.08}
+{"Time":"2026-09-06T14:38:23.487978002-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestUnpublishedAttemptSurvivesReopenWithoutBudgetConsumption"}
+{"Time":"2026-09-06T14:38:23.487979035-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestUnpublishedAttemptSurvivesReopenWithoutBudgetConsumption","Output":"=== RUN   TestUnpublishedAttemptSurvivesReopenWithoutBudgetConsumption\n"}
+{"Time":"2026-09-06T14:38:23.51872658-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery/before_xadd","Output":"--- PASS: TestRedisPublicationFailureReusesDurableDelivery/before_xadd (0.11s)\n"}
+{"Time":"2026-09-06T14:38:23.518749567-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery/before_xadd","Elapsed":0.11}
+{"Time":"2026-09-06T14:38:23.518762653-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery/after_xadd_lost_reply"}
+{"Time":"2026-09-06T14:38:23.518764992-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery/after_xadd_lost_reply","Output":"=== RUN   TestRedisPublicationFailureReusesDurableDelivery/after_xadd_lost_reply\n"}
+{"Time":"2026-09-06T14:38:23.646173738-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestUnpublishedAttemptSurvivesReopenWithoutBudgetConsumption","Output":"--- PASS: TestUnpublishedAttemptSurvivesReopenWithoutBudgetConsumption (0.16s)\n"}
+{"Time":"2026-09-06T14:38:23.646190829-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestUnpublishedAttemptSurvivesReopenWithoutBudgetConsumption","Elapsed":0.16}
+{"Time":"2026-09-06T14:38:23.646194839-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestConcurrentAttemptCreatorsHaveOneDurableIntent"}
+{"Time":"2026-09-06T14:38:23.646199465-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestConcurrentAttemptCreatorsHaveOneDurableIntent","Output":"=== RUN   TestConcurrentAttemptCreatorsHaveOneDurableIntent\n"}
+{"Time":"2026-09-06T14:38:23.670559438-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery/after_xadd_lost_reply","Output":"--- PASS: TestRedisPublicationFailureReusesDurableDelivery/after_xadd_lost_reply (0.15s)\n"}
+{"Time":"2026-09-06T14:38:23.670582194-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery/after_xadd_lost_reply","Elapsed":0.15}
+{"Time":"2026-09-06T14:38:23.670623282-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery","Output":"--- PASS: TestRedisPublicationFailureReusesDurableDelivery (0.26s)\n"}
+{"Time":"2026-09-06T14:38:23.670639004-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Test":"TestRedisPublicationFailureReusesDurableDelivery","Elapsed":0.26}
+{"Time":"2026-09-06T14:38:23.670668966-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Output":"PASS\n"}
+{"Time":"2026-09-06T14:38:24.056916642-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestConcurrentAttemptCreatorsHaveOneDurableIntent","Output":"--- PASS: TestConcurrentAttemptCreatorsHaveOneDurableIntent (0.41s)\n"}
+{"Time":"2026-09-06T14:38:24.056933852-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestConcurrentAttemptCreatorsHaveOneDurableIntent","Elapsed":0.41}
+{"Time":"2026-09-06T14:38:24.056937454-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry"}
+{"Time":"2026-09-06T14:38:24.056938733-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry","Output":"=== RUN   TestDeliveryFencesAndExpiry\n"}
+{"Time":"2026-09-06T14:38:24.05694964-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/session_replacement"}
+{"Time":"2026-09-06T14:38:24.05695082-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/session_replacement","Output":"=== RUN   TestDeliveryFencesAndExpiry/session_replacement\n"}
+{"Time":"2026-09-06T14:38:24.131254059-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/tests/integration","Test":"TestRealServicesDeliverCommandToSimulator","Output":"    runtime_test.go:173: REST -\u003e PostgreSQL intent -\u003e Redis Stream -\u003e Gateway -\u003e gRPC simulator -\u003e ACK: SUCCEEDED; duplicate same command; attempts=1 intents=1\n"}
+{"Time":"2026-09-06T14:38:24.151217185-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/session_replacement","Output":"--- PASS: TestDeliveryFencesAndExpiry/session_replacement (0.09s)\n"}
+{"Time":"2026-09-06T14:38:24.151234809-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/session_replacement","Elapsed":0.09}
+{"Time":"2026-09-06T14:38:24.151241575-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/lease_release"}
+{"Time":"2026-09-06T14:38:24.151244086-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/lease_release","Output":"=== RUN   TestDeliveryFencesAndExpiry/lease_release\n"}
+{"Time":"2026-09-06T14:38:24.310263176-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/lease_release","Output":"--- PASS: TestDeliveryFencesAndExpiry/lease_release (0.16s)\n"}
+{"Time":"2026-09-06T14:38:24.310278759-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/lease_release","Elapsed":0.16}
+{"Time":"2026-09-06T14:38:24.310283631-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/command_expiry"}
+{"Time":"2026-09-06T14:38:24.310284696-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/command_expiry","Output":"=== RUN   TestDeliveryFencesAndExpiry/command_expiry\n"}
+{"Time":"2026-09-06T14:38:24.382816974-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/command_expiry","Output":"--- PASS: TestDeliveryFencesAndExpiry/command_expiry (0.07s)\n"}
+{"Time":"2026-09-06T14:38:24.382834445-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/command_expiry","Elapsed":0.07}
+{"Time":"2026-09-06T14:38:24.382838178-07:00","Action":"run","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/terminal_ack"}
+{"Time":"2026-09-06T14:38:24.382839265-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/terminal_ack","Output":"=== RUN   TestDeliveryFencesAndExpiry/terminal_ack\n"}
+{"Time":"2026-09-06T14:38:24.406747832-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control","Output":"ok  \tgithub.com/fleetrelay/fleetrelay/internal/control\t1.010s\n"}
+{"Time":"2026-09-06T14:38:24.406768757-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control","Elapsed":1.011}
+{"Time":"2026-09-06T14:38:24.407951113-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Output":"ok  \tgithub.com/fleetrelay/fleetrelay/internal/controlhttp\t1.012s\n"}
+{"Time":"2026-09-06T14:38:24.407962591-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/controlhttp","Elapsed":1.012}
+{"Time":"2026-09-06T14:38:24.410545102-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/relay","Output":"ok  \tgithub.com/fleetrelay/fleetrelay/internal/relay\t1.014s\n"}
+{"Time":"2026-09-06T14:38:24.410560523-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/relay","Elapsed":1.014}
+{"Time":"2026-09-06T14:38:24.521575739-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/terminal_ack","Output":"--- PASS: TestDeliveryFencesAndExpiry/terminal_ack (0.14s)\n"}
+{"Time":"2026-09-06T14:38:24.521600323-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry/terminal_ack","Elapsed":0.14}
+{"Time":"2026-09-06T14:38:24.521611085-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry","Output":"--- PASS: TestDeliveryFencesAndExpiry (0.46s)\n"}
+{"Time":"2026-09-06T14:38:24.521622819-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Test":"TestDeliveryFencesAndExpiry","Elapsed":0.46}
+{"Time":"2026-09-06T14:38:24.52164358-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Output":"PASS\n"}
+{"Time":"2026-09-06T14:38:24.677441708-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Output":"ok  \tgithub.com/fleetrelay/fleetrelay/cmd/dispatcher\t1.281s\n"}
+{"Time":"2026-09-06T14:38:24.677492633-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/cmd/dispatcher","Elapsed":1.2810000000000001}
+{"Time":"2026-09-06T14:38:25.530766734-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Output":"ok  \tgithub.com/fleetrelay/fleetrelay/internal/control/postgres\t2.134s\n"}
+{"Time":"2026-09-06T14:38:25.530784647-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/internal/control/postgres","Elapsed":2.134}
+{"Time":"2026-09-06T14:38:27.197117079-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/tests/integration","Test":"TestRealServicesDeliverCommandToSimulator","Output":"--- PASS: TestRealServicesDeliverCommandToSimulator (3.79s)\n"}
+{"Time":"2026-09-06T14:38:27.19713545-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/tests/integration","Test":"TestRealServicesDeliverCommandToSimulator","Elapsed":3.79}
+{"Time":"2026-09-06T14:38:27.197140165-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/tests/integration","Output":"PASS\n"}
+{"Time":"2026-09-06T14:38:28.202789433-07:00","Action":"output","Package":"github.com/fleetrelay/fleetrelay/tests/integration","Output":"ok  \tgithub.com/fleetrelay/fleetrelay/tests/integration\t4.806s\n"}
+{"Time":"2026-09-06T14:38:28.202847597-07:00","Action":"pass","Package":"github.com/fleetrelay/fleetrelay/tests/integration","Elapsed":4.806}

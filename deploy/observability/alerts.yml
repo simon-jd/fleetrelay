@@ -9,12 +9,19 @@ groups:
           summary: "FleetRelay target {{ $labels.instance }} is unavailable"
           description: "Prometheus has failed to scrape {{ $labels.job }} for 30 seconds."
       - alert: FleetRelayOutboxBacklog
-        expr: outbox_oldest_unpublished_seconds > 30
+        expr: outbox_oldest_unpublished_seconds{job="dispatcher"} > 30
         for: 1m
         labels: { severity: warning }
         annotations:
           summary: "FleetRelay outbox has been delayed"
           description: "The oldest unpublished outbox item is {{ $value | humanizeDuration }} old."
+      - alert: FleetRelayOutboxRetryWaiting
+        expr: fleetrelay_outbox_retry_waiting{job="dispatcher"} > 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "FleetRelay outbox retries remain delayed"
+          description: "Inspect Dispatcher logs and pending outbox retry times; do not delete delivery intents."
       - alert: FleetRelayRedisConsumerLag
         expr: redis_consumer_lag > 1000
         for: 2m

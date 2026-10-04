@@ -1,0 +1,948 @@
+{
+  "run_id": "fleetrelay-local-docker-20260907",
+  "completed_at": "2026-09-07T23:26:37.914696+00:00",
+  "base_commit": "84206e198423529c244ef4ac12072230a004e8df",
+  "publication_status": "local_only_uncommitted; baseline is archived pre-followup working tree, not old HEAD",
+  "environment": {
+    "captured_at": "2026-09-07T23:24:22.183280+00:00",
+    "mode": "local_docker_and_simulated_device",
+    "os": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "cpu": "13th Gen Intel(R) Core(TM) i9-13900K",
+    "logical_cpus": 32,
+    "memory": "MemTotal:       129209084 kB",
+    "go": "go version go1.26.8 linux/amd64",
+    "docker": "29.8.0",
+    "compose": "5.3.1",
+    "postgres": "17.6",
+    "redis": "Redis server v=8.2.9 sha=00000000:1 malloc=jemalloc-5.3.0 bits=64 build=50fae648cb7b8097",
+    "dependency_images": [
+      {
+        "id": "sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94",
+        "repo_tags": [
+          "postgres:17.6-alpine"
+        ],
+        "repo_digests": [
+          "postgres@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94"
+        ]
+      },
+      {
+        "id": "sha256:30abb90e62f14b737010746def3ba99cc79fe19dcdb3d37b41f21fc62e7da19d",
+        "repo_tags": [
+          "redis:8.2-alpine"
+        ],
+        "repo_digests": [
+          "redis@sha256:30abb90e62f14b737010746def3ba99cc79fe19dcdb3d37b41f21fc62e7da19d"
+        ]
+      },
+      {
+        "id": "sha256:76947e7ef22f8a698fc638f706685909be425dbe09bd7a2cd7aca849f79b5f64",
+        "repo_tags": [
+          "prom/prometheus:v3.6.0"
+        ],
+        "repo_digests": [
+          "prom/prometheus@sha256:76947e7ef22f8a698fc638f706685909be425dbe09bd7a2cd7aca849f79b5f64"
+        ]
+      },
+      {
+        "id": "sha256:a1701c2180249361737a99a01bc770db39381640e4d631825d38ff4535efa47d",
+        "repo_tags": [
+          "grafana/grafana:12.1.1"
+        ],
+        "repo_digests": [
+          "grafana/grafana@sha256:a1701c2180249361737a99a01bc770db39381640e4d631825d38ff4535efa47d"
+        ]
+      }
+    ],
+    "topology": "Single Linux workstation, local bridge network; Control API, two Gateways, one active Dispatcher, four load simulators plus one idle crash simulator, PostgreSQL, Redis, Prometheus and Grafana. No cloud/production endpoints or physical devices. Application containers 1 CPU/256 MiB, PostgreSQL 2 CPU/512 MiB, Redis 1 CPU/256 MiB; no exclusive CPU pinning."
+  },
+  "go_tests": {
+    "counts": {
+      "pass": 29,
+      "fail": 0,
+      "skip": 0
+    },
+    "top_level_tests": {
+      "pass": [
+        "github.com/fleetrelay/fleetrelay/cmd/device-sim:TestJournalReplayAfterReopenAndFingerprintConflict",
+        "github.com/fleetrelay/fleetrelay/cmd/device-sim:TestJournalRejectsCorruptionWrongDeviceAndConcurrentOwner",
+        "github.com/fleetrelay/fleetrelay/cmd/device-sim:TestJournalPersistenceFailureRequiresRestart",
+        "github.com/fleetrelay/fleetrelay/cmd/device-sim:TestJournalConcurrentDuplicateHasOneSimulatedEffect",
+        "github.com/fleetrelay/fleetrelay/cmd/device-sim:TestJournalCancellationAndFences",
+        "github.com/fleetrelay/fleetrelay/internal/controlhttp:TestInternalEndpointRequiresSharedToken",
+        "github.com/fleetrelay/fleetrelay/internal/controlhttp:TestReadinessFailsClosed",
+        "github.com/fleetrelay/fleetrelay/internal/relay:TestBoundedReliableAndCoalescedTelemetry",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestLeaseFencingAndIdempotentCommand",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestStaleSessionAndLateAckReconciliation",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestConcurrentLeaseHasSingleWinner",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestStateMachineProperty",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestFastAckIsAtomicAndBoundToAttempt",
+        "github.com/fleetrelay/fleetrelay/internal/control:TestListDevicesReflectsPresence",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestAttemptAndDeliveryCommitTogether",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestUnpublishedAttemptSurvivesReopenWithoutBudgetConsumption",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestRedisPublicationFailureReusesDurableDelivery",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestConfirmationFailureDefersSameDelivery",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestConcurrentAttemptCreatorsHaveOneDurableIntent",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestOutboxMetricsIncludeDelayedRowsAndFailClosed",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestDeliveryFencesAndExpiry",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestOutboxRetrySurvivesReopenAndRejectsStaleFailure",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestOutboxRetryMigrationPreservesExistingRows",
+        "github.com/fleetrelay/fleetrelay/internal/control/postgres:TestOutboxDeferralCancellationAndBounds",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestOutboxItemTimeoutDoesNotCancelNextRow",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestOutboxBatchPublishesNewCommittedIntentWithoutAnotherTick",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestOutboxBatchMakesProgressPastPoisonRows",
+        "github.com/fleetrelay/fleetrelay/cmd/dispatcher:TestPublicationBackoffBounds",
+        "github.com/fleetrelay/fleetrelay/tests/integration:TestRealServicesDeliverCommandToSimulator"
+      ],
+      "fail": [],
+      "skip": []
+    }
+  },
+  "coverage": {
+    "application_statement_percent": 26.5,
+    "covered_statements": 490,
+    "total_statements": 1846,
+    "method": "Full race coverage profile excluding /gen/ and /web/node_modules/ entries only; native service subprocess binaries and Docker binaries are not coverage-instrumented. Not E2E coverage or a resume-selected metric."
+  },
+  "checks": [
+    {
+      "name": "integration-start",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "fleetrelay-journal-review",
+        "-f",
+        "tests/integration/compose.yml",
+        "up",
+        "-d",
+        "--wait"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 2.0117346509941854,
+      "log": "integration-start.log",
+      "log_sha256": "d7fe86887ae13ab7bcfb351ae51e214294f4866c2c118ba86623ae461925a219"
+    },
+    {
+      "name": "migration-bootstrap",
+      "command": [
+        "psql",
+        "-X",
+        "postgres://fleetrelay:integration-only@127.0.0.1:15439/fleetrelay_test?sslmode=disable",
+        "--set",
+        "ON_ERROR_STOP=1",
+        "--file",
+        "tests/integration/migrations.sql"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.06989667098969221,
+      "log": "migration-bootstrap.log",
+      "log_sha256": "5be39c0a8112905e6e5be85466f839b3eece3d97635ad27c7cb2818f93fcff5a"
+    },
+    {
+      "name": "followup-negative-control",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-run",
+        "^TestOutboxBatchPublishesNewCommittedIntentWithoutAnotherTick$",
+        "-v",
+        "./cmd/dispatcher"
+      ],
+      "cwd": "/tmp/fleetrelay-docker-lab/baseline-regression",
+      "exit_code": 1,
+      "expected_exit_code": 1,
+      "elapsed_seconds": 1.0637199449993204,
+      "log": "followup-negative-control.log",
+      "log_sha256": "e3850caa62a563d28a8e7487314fc9e345e9139ccf27de05fad677dbdf5035d9"
+    },
+    {
+      "name": "go-race-build",
+      "command": [
+        "go",
+        "build",
+        "-race",
+        "-o",
+        "/tmp/fleetrelay-docker-lab/bin/",
+        "./cmd/..."
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.9464667040010681,
+      "log": "go-race-build.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "go-race",
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-count=1",
+        "-coverprofile=/tmp/fleetrelay-docker-lab/coverage.out",
+        "-covermode=atomic",
+        "-json",
+        "./..."
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 5.942120095001883,
+      "log": "go-race.log",
+      "log_sha256": "adede09d432b940bf543f4ce7bcd02a8f90094b6807a641685726601a66ad736"
+    },
+    {
+      "name": "go-vet",
+      "command": [
+        "go",
+        "vet",
+        "./..."
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.17729616699216422,
+      "log": "go-vet.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "gofmt",
+      "command": [
+        "gofmt",
+        "-l",
+        "cmd",
+        "internal"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.007589064000057988,
+      "log": "gofmt.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "docker-lab-config",
+      "command": [
+        "docker",
+        "compose",
+        "-f",
+        "tests/docker/compose.yml",
+        "config",
+        "--quiet"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.05546351498924196,
+      "log": "docker-lab-config.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "python-compile",
+      "command": [
+        "python3",
+        "-m",
+        "py_compile",
+        "scripts/build-docker-lab.py",
+        "scripts/verify-docker-lab.py"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.032154428990907036,
+      "log": "python-compile.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "integration-cleanup",
+      "command": [
+        "docker",
+        "compose",
+        "-p",
+        "fleetrelay-journal-review",
+        "-f",
+        "tests/integration/compose.yml",
+        "down",
+        "--volumes"
+      ],
+      "cwd": "/home/postedism/Desktop/Go FleetRelay",
+      "exit_code": 0,
+      "expected_exit_code": 0,
+      "elapsed_seconds": 0.6764512980007567,
+      "log": "integration-cleanup.log",
+      "log_sha256": "13b0e886ea432feb0b07ed3695034ce9c26cb24e02380e7d617cb26de7563417"
+    }
+  ],
+  "reliability": [
+    {
+      "scenario": "container_deployment_and_idempotency",
+      "mode": "local_docker_and_simulated_device",
+      "status": "passed",
+      "command_id": "6742d613-1ab8-42fa-af9d-e5b3a1015e97",
+      "duplicate_submission_same_id": true,
+      "attempts": 1,
+      "runtime": {
+        "control-api": {
+          "image_id": "sha256:73e86db5e2dede9b24b87d063a40fc53b6528b127bd4a7cda38dd6df0761ce24",
+          "user": "fleetrelay",
+          "memory_limit_bytes": 268435456,
+          "cpu_limit_nanocpus": 1000000000,
+          "read_only_root": true
+        },
+        "dispatcher": {
+          "image_id": "sha256:41ce667d8d1a9afbc2f7e2e690c46d4b66bc41b3fe024e4d26deea20df19236a",
+          "user": "fleetrelay",
+          "memory_limit_bytes": 268435456,
+          "cpu_limit_nanocpus": 1000000000,
+          "read_only_root": true
+        },
+        "gateway-a": {
+          "image_id": "sha256:f514f844dea045e54dd14bb05f7948903d34fd7e7b8a3e7fc31391b4dfa7ec4d",
+          "user": "fleetrelay",
+          "memory_limit_bytes": 268435456,
+          "cpu_limit_nanocpus": 1000000000,
+          "read_only_root": true
+        },
+        "gateway-b": {
+          "image_id": "sha256:f514f844dea045e54dd14bb05f7948903d34fd7e7b8a3e7fc31391b4dfa7ec4d",
+          "user": "fleetrelay",
+          "memory_limit_bytes": 268435456,
+          "cpu_limit_nanocpus": 1000000000,
+          "read_only_root": true
+        },
+        "device-1": {
+          "image_id": "sha256:4bb5e31d98851ebf629a5d29e96094b485d899e16433943f45dfbc1183b01d5e",
+          "user": "fleetrelay",
+          "memory_limit_bytes": 268435456,
+          "cpu_limit_nanocpus": 1000000000,
+          "read_only_root": true
+        }
+      }
+    },
+    {
+      "scenario": "simulator_crash_after_persist_before_ack",
+      "mode": "local_docker_and_simulated_device",
+      "status": "passed",
+      "command_id": "c9bd2fa4-8b31-425b-8a7b-cdecec36a541",
+      "process_restarts_delta": 1,
+      "simulated_effects_delta": 1,
+      "attempts": 2,
+      "boundary": "Counter and result share one fsynced snapshot; this does not model atomic physical actuator effects."
+    },
+    {
+      "scenario": "gateway_sigkill_accepted_command_recovery",
+      "mode": "local_docker_and_simulated_device",
+      "status": "passed",
+      "command_id": "c0edd318-650a-4756-b9fc-a27bc02b2fda",
+      "from": "gateway-a",
+      "to": "gateway-b",
+      "recovery_seconds": 1.3963793820003048,
+      "old_exit_code": 137,
+      "boundary": "Accepted command held before scheduling; not an in-flight physical execution test."
+    },
+    {
+      "scenario": "redis_pause_and_recovery",
+      "mode": "local_docker_and_simulated_device",
+      "status": "passed",
+      "command_id": "3d615d1b-da52-4592-acbe-bbad1bf5a315",
+      "outage_status": "PENDING_TRANSPORT",
+      "recovery_seconds_after_resume": 0.6104160440008854,
+      "same_command_succeeded": true
+    },
+    {
+      "scenario": "postgres_sigkill_committed_command_recovery",
+      "mode": "local_docker_and_simulated_device",
+      "status": "passed",
+      "command_id": "7c9e7a49-e74a-417c-be29-ef4f0a216291",
+      "readiness_during_outage": 503,
+      "recovery_seconds": 3.5425841260002926,
+      "boundary": "Single PostgreSQL container WAL recovery on its retained volume; not managed failover, RPO certification or regional DR."
+    },
+    {
+      "scenario": "live_prometheus_and_grafana_provisioning",
+      "mode": "local_docker_and_simulated_device",
+      "status": "passed",
+      "application_targets_up": 4,
+      "outbox_series": [
+        {
+          "metric": {
+            "__name__": "fleetrelay_outbox_pending",
+            "instance": "dispatcher:8082",
+            "job": "dispatcher"
+          },
+          "value": [
+            1788823009.012,
+            "0"
+          ]
+        }
+      ],
+      "grafana_dashboard_uid": "fleetrelay-command-delivery",
+      "boundary": "HTTP API provisioning and real Prometheus samples; no visual panel rendering assertion."
+    },
+    {
+      "scenario": "logical_backup_restore",
+      "mode": "local_docker_and_simulated_device",
+      "status": "passed",
+      "database": "restore_5808e1b3ce7b",
+      "dump_sha256": "f65d1663eebf6fb567b452bc6ad50a9e57103857197c7a16e63da31a01f62712",
+      "before": {
+        "devices": "{\"rows\" : 5, \"md5\" : \"3d154e3311a415ecbfa393a8f64a2b03\"}",
+        "device_sessions": "{\"rows\" : 11, \"md5\" : \"7342998aaae0f0195184685f4b67eb5b\"}",
+        "control_leases": "{\"rows\" : 5, \"md5\" : \"3d0ec22c9d7d263ca401f0f656d3365e\"}",
+        "commands": "{\"rows\" : 5, \"md5\" : \"7f17c9c9d734e71c20112e9daf4bea3d\"}",
+        "command_attempts": "{\"rows\" : 6, \"md5\" : \"b933e90cd12d387a2652e4be2386d8be\"}",
+        "audit_records": "{\"rows\" : 5, \"md5\" : \"7f0184dbfdadd2012a622757b4355b40\"}",
+        "outbox": "{\"rows\" : 37, \"md5\" : \"6f8bb69817661dad6b62b688c931d2f1\"}"
+      },
+      "after": {
+        "devices": "{\"rows\" : 5, \"md5\" : \"3d154e3311a415ecbfa393a8f64a2b03\"}",
+        "device_sessions": "{\"rows\" : 11, \"md5\" : \"7342998aaae0f0195184685f4b67eb5b\"}",
+        "control_leases": "{\"rows\" : 5, \"md5\" : \"3d0ec22c9d7d263ca401f0f656d3365e\"}",
+        "commands": "{\"rows\" : 5, \"md5\" : \"7f17c9c9d734e71c20112e9daf4bea3d\"}",
+        "command_attempts": "{\"rows\" : 6, \"md5\" : \"b933e90cd12d387a2652e4be2386d8be\"}",
+        "audit_records": "{\"rows\" : 5, \"md5\" : \"7f0184dbfdadd2012a622757b4355b40\"}",
+        "outbox": "{\"rows\" : 37, \"md5\" : \"6f8bb69817661dad6b62b688c931d2f1\"}"
+      },
+      "boundary": "Logical backup into another database in the same local PostgreSQL instance; no WAL archive/PITR or independent-region restore."
+    },
+    {
+      "scenario": "live_dispatcher_down_alert",
+      "mode": "local_docker_and_simulated_device",
+      "status": "passed",
+      "firing_samples": [
+        {
+          "metric": {
+            "__name__": "ALERTS",
+            "alertname": "FleetRelayTargetDown",
+            "alertstate": "firing",
+            "instance": "dispatcher:8082",
+            "job": "dispatcher",
+            "severity": "critical"
+          },
+          "value": [
+            1788823041.505,
+            "1"
+          ]
+        }
+      ]
+    }
+  ],
+  "performance": {
+    "mode": "local_docker_simulated_device_closed_loop",
+    "pairs": 5,
+    "concurrent_devices": 4,
+    "commands_per_device_per_run": 25,
+    "measured_commands_per_variant": 500,
+    "warmup_commands_per_device_per_run": 4,
+    "client_poll_interval_seconds": 0.02,
+    "adapter_delay_ms": 25,
+    "lease_fixture": "Lease deadlines extended to one hour with SQL before each workload; command creation and result observation use REST.",
+    "p95_method": "Nearest-rank p95 per 100-command run; report median across five runs per variant.",
+    "median_run_p95_seconds": {
+      "baseline": 0.5315643880021526,
+      "candidate": 0.27816036199510563
+    },
+    "p95_reduction_percent": 47.671369965066354,
+    "formula": "(baseline median run p95 - candidate median run p95) / baseline median run p95 * 100",
+    "all_measured_commands_succeeded": true,
+    "comparison_scope": "Only Dispatcher image changes; other services use the same candidate images, durable simulator journals and resource limits. Same local database grows across alternating AB/BA runs. No dedicated CPU isolation; not open-loop capacity, physical-device latency or production SLO."
+  },
+  "performance_runs": [
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 12.40406063599221,
+      "throughput_commands_per_second": 8.06187610126923,
+      "median_seconds": 0.4972183104910073,
+      "p95_seconds": 0.5182049720024224,
+      "p99_seconds": 0.520003681012895,
+      "min_seconds": 0.39135578100103885,
+      "max_seconds": 0.5200275730021531,
+      "pair": 1,
+      "variant": "baseline",
+      "image_id": "sha256:3b35fe5d8d388dfabaf5c4ae03e8d665614efbb7aea55166869fc5379bfd3b18"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 6.190041192996432,
+      "throughput_commands_per_second": 16.154981345381433,
+      "median_seconds": 0.24716914400050882,
+      "p95_seconds": 0.28223335200164,
+      "p99_seconds": 0.30526871999609284,
+      "min_seconds": 0.17227433499647304,
+      "max_seconds": 0.32590831599372905,
+      "pair": 1,
+      "variant": "candidate",
+      "image_id": "sha256:41ce667d8d1a9afbc2f7e2e690c46d4b66bc41b3fe024e4d26deea20df19236a"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 6.203496720001567,
+      "throughput_commands_per_second": 16.119940819437517,
+      "median_seconds": 0.2546716569995624,
+      "p95_seconds": 0.27816036199510563,
+      "p99_seconds": 0.28416237799683586,
+      "min_seconds": 0.172495753999101,
+      "max_seconds": 0.2842893820052268,
+      "pair": 2,
+      "variant": "candidate",
+      "image_id": "sha256:41ce667d8d1a9afbc2f7e2e690c46d4b66bc41b3fe024e4d26deea20df19236a"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 12.456563384999754,
+      "throughput_commands_per_second": 8.027896371516114,
+      "median_seconds": 0.4968711504989187,
+      "p95_seconds": 0.5190220759977819,
+      "p99_seconds": 0.5255050769919762,
+      "min_seconds": 0.45155677798902616,
+      "max_seconds": 0.5342877829971258,
+      "pair": 2,
+      "variant": "baseline",
+      "image_id": "sha256:3b35fe5d8d388dfabaf5c4ae03e8d665614efbb7aea55166869fc5379bfd3b18"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 12.473226044006879,
+      "throughput_commands_per_second": 8.017172113067565,
+      "median_seconds": 0.49700061350449687,
+      "p95_seconds": 0.5420307199965464,
+      "p99_seconds": 0.5428147539932979,
+      "min_seconds": 0.45218492099957075,
+      "max_seconds": 0.5429444100009277,
+      "pair": 3,
+      "variant": "baseline",
+      "image_id": "sha256:3b35fe5d8d388dfabaf5c4ae03e8d665614efbb7aea55166869fc5379bfd3b18"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 6.2425463419931475,
+      "throughput_commands_per_second": 16.019104147823043,
+      "median_seconds": 0.254908915492706,
+      "p95_seconds": 0.2817047580028884,
+      "p99_seconds": 0.3019169589970261,
+      "min_seconds": 0.19337292200361844,
+      "max_seconds": 0.30331827299960423,
+      "pair": 3,
+      "variant": "candidate",
+      "image_id": "sha256:41ce667d8d1a9afbc2f7e2e690c46d4b66bc41b3fe024e4d26deea20df19236a"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 6.176882001003833,
+      "throughput_commands_per_second": 16.189397819765468,
+      "median_seconds": 0.25458475699997507,
+      "p95_seconds": 0.26230435600155033,
+      "p99_seconds": 0.27631069101335015,
+      "min_seconds": 0.15320425199752208,
+      "max_seconds": 0.2787824679980986,
+      "pair": 4,
+      "variant": "candidate",
+      "image_id": "sha256:41ce667d8d1a9afbc2f7e2e690c46d4b66bc41b3fe024e4d26deea20df19236a"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 12.465201846003765,
+      "throughput_commands_per_second": 8.022332990304456,
+      "median_seconds": 0.4941857105004601,
+      "p95_seconds": 0.5315643880021526,
+      "p99_seconds": 0.5539327639999101,
+      "min_seconds": 0.4289385320007568,
+      "max_seconds": 0.5749269660009304,
+      "pair": 4,
+      "variant": "baseline",
+      "image_id": "sha256:3b35fe5d8d388dfabaf5c4ae03e8d665614efbb7aea55166869fc5379bfd3b18"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 12.445606146997306,
+      "throughput_commands_per_second": 8.034964212982631,
+      "median_seconds": 0.4974775904920534,
+      "p95_seconds": 0.5383326959999977,
+      "p99_seconds": 0.5534789810044458,
+      "min_seconds": 0.4080043550056871,
+      "max_seconds": 0.556511742004659,
+      "pair": 5,
+      "variant": "baseline",
+      "image_id": "sha256:3b35fe5d8d388dfabaf5c4ae03e8d665614efbb7aea55166869fc5379bfd3b18"
+    },
+    {
+      "requests": 100,
+      "failures": 0,
+      "duration_seconds": 6.231876770005329,
+      "throughput_commands_per_second": 16.04653039375079,
+      "median_seconds": 0.2546388545015361,
+      "p95_seconds": 0.26905848398746457,
+      "p99_seconds": 0.27856164300465025,
+      "min_seconds": 0.1922568849986419,
+      "max_seconds": 0.2819849389925366,
+      "pair": 5,
+      "variant": "candidate",
+      "image_id": "sha256:41ce667d8d1a9afbc2f7e2e690c46d4b66bc41b3fe024e4d26deea20df19236a"
+    }
+  ],
+  "image_builds": [
+    {
+      "service": "dispatcher",
+      "variant": "baseline",
+      "image": "fleetrelay-lab-dispatcher:baseline",
+      "image_id": "sha256:3b35fe5d8d388dfabaf5c4ae03e8d665614efbb7aea55166869fc5379bfd3b18",
+      "exit_code": 0,
+      "log": "build-dispatcher-baseline.log"
+    },
+    {
+      "service": "control-api",
+      "variant": "candidate",
+      "image": "fleetrelay-lab-control-api:candidate",
+      "image_id": "sha256:73e86db5e2dede9b24b87d063a40fc53b6528b127bd4a7cda38dd6df0761ce24",
+      "exit_code": 0,
+      "log": "build-control-api-candidate.log"
+    },
+    {
+      "service": "stream-gateway",
+      "variant": "candidate",
+      "image": "fleetrelay-lab-stream-gateway:candidate",
+      "image_id": "sha256:f514f844dea045e54dd14bb05f7948903d34fd7e7b8a3e7fc31391b4dfa7ec4d",
+      "exit_code": 0,
+      "log": "build-stream-gateway-candidate.log"
+    },
+    {
+      "service": "dispatcher",
+      "variant": "candidate",
+      "image": "fleetrelay-lab-dispatcher:candidate",
+      "image_id": "sha256:41ce667d8d1a9afbc2f7e2e690c46d4b66bc41b3fe024e4d26deea20df19236a",
+      "exit_code": 0,
+      "log": "build-dispatcher-candidate.log"
+    },
+    {
+      "service": "device-sim",
+      "variant": "candidate",
+      "image": "fleetrelay-lab-device-sim:candidate",
+      "image_id": "sha256:4bb5e31d98851ebf629a5d29e96094b485d899e16433943f45dfbc1183b01d5e",
+      "exit_code": 0,
+      "log": "build-device-sim-candidate.log"
+    }
+  ],
+  "source_hashes": {
+    ".github/workflows/ci.yml": "671da89c6d4d9015b451e285ce71143d65a2d891f470b30c0d475e481ad4bce5",
+    "README.md": "d083e9cb856beb446cd57e1b0746aba2d5f9d9ff8c31f2d98e3b26820aae7f20",
+    "cmd/control-api/main.go": "80514e19f61026c4b488e6f93b0ecb3d7cae5d802daf12626dbcb5b2c062b172",
+    "cmd/device-sim/journal.go": "aa1c8c01f32bbe01306d7b97c4ca6705344409930cb9ea5dfe6b4c06da05df33",
+    "cmd/device-sim/journal_test.go": "ef1d3278ffcbb76a44e84ea9ed1349b23b4070a53f4025b40feb3fadf69bddf1",
+    "cmd/device-sim/main.go": "df44b1b864ce7dbc706b7363e47da83e710af25ac3d2713fdc10d7e89b7da584",
+    "cmd/dispatcher/delivery_integration_test.go": "08e23eb5e60fc99674289cbafca1a675a46b8acff7122a033843789959fac7cd",
+    "cmd/dispatcher/main.go": "8daa4e08a11aca8200693dc72fddce18c2dfcec987fde9296c4f8768dc06b1da",
+    "cmd/dispatcher/outbox.go": "7ba90c2495580f3e3119a4754e38bd329a813256e8ef046f36774dcf287a140f",
+    "cmd/dispatcher/outbox_metrics_integration_test.go": "57c8e81793a6a402d3ae01dee1c76a245f0ca5defdcc4937f1f35119e2a12dc2",
+    "cmd/dispatcher/outbox_progress_integration_test.go": "40c833beca24b8b8e02c0bdf91a15cf506951888ed9016b8d6356bdacef7fb0e",
+    "cmd/dispatcher/outbox_test.go": "c23d2b0ddbd7cc827aa22c3053e43822d75ace3ceb9cd62d56dc7940ab3646dc",
+    "cmd/stream-gateway/main.go": "224dcb7a30f697e2ae6627b6e719f4ccee78966461ebc20dbcc9387ca776de11",
+    "deploy/docker/go-service.Dockerfile": "b1a6435e9859bfb20fdf60ab3c627b4fecb5eced0c8f3f3e893ecb7bfd8d68d4",
+    "docs/adr/019-local-docker-recovery-and-bounded-dispatch.md": "4684e96cacde3253adbdc73f1f84a2a8bf953a0c0988f4539d2ddce995342c0b",
+    "docs/production-test-matrix.md": "1185dd78c8a812e91b6a323281ac8180ec8c1ecb48621ec53f25f7d14abdc266",
+    "docs/runbook.md": "1c537f053999f2c3827dbf0fcb534f838d44537a49bb26ab7143806391c2cd2b",
+    "go.mod": "022aad0c471c653df95fdc3399c9990d80378aa8d4b188663d7ecd618a455c99",
+    "go.sum": "199ab84f66f907409361aa8d3f0d613b4564925ecff0055a4c874ebfd9466ba3",
+    "internal/control/memory/store.go": "c9dcafe476834ab59704dd95f4f2b9040bb247b717b102bcfa7066cb511b90ae",
+    "internal/control/model.go": "a021de52752c53d51ab799e66a6e4329a7db0b62063a4963ac3ad957be2e9d89",
+    "internal/control/postgres/delivery_integration_test.go": "8cee237072f05543dc04b4c3e16221c4edb2bf8544b6c4fdb605c55a4a4f1df1",
+    "internal/control/postgres/outbox.go": "0868243e70a73aa6c86dc0d9525b877798574dfa6835c6cc2cc78dca48c289cd",
+    "internal/control/postgres/outbox_integration_test.go": "e155aee043eb730b7d338280cd095e3ab39749a1fbaf86f6f2cffca19c52f1fa",
+    "internal/control/postgres/store.go": "04d26d6f1c3ed104536cca3fb8aaa4ef7c41931480a0fda34667220ec95f5c58",
+    "internal/control/service.go": "c71ad4b0ce52d36e3d8a47d74dc8dc11a34abc015f08b268025c59407cff1e4c",
+    "internal/control/service_test.go": "19d5f03451f79ff262f634b394ff66e2317e0cb2931ca64f37356b83480fe679",
+    "internal/control/store.go": "ef302523808d5c7c14882b99879651f9baf7290d8bff7c4f92b906f5413ab459",
+    "internal/controlhttp/server.go": "cd195bd803e713daec8c843a71a90ddeebb3dfab776e94b775d36b8c1ff732ab",
+    "internal/controlhttp/server_test.go": "73da9fbe33428aa4972d1120920e92e502a1872a143309eeec1a37dbb9df6e32",
+    "internal/relay/outbound.go": "9218d98cb2ead39d7a896a34751ba5d7f2ad13432efdb0f7e92eaac15ffe7f73",
+    "internal/relay/outbound_test.go": "469c8ca4e41961f33049a92d216f30556f1ca6b126dc0b5c3f37cbbf7a7c8b57",
+    "internal/relay/registry.go": "f410376466becc532b2435b51c0d7ea3e815dc8e27210b8cc2e935ef5d0c1a97",
+    "internal/testutil/postgres.go": "ce34f4b8d69a85f276c6c6acabde6301509cd38b125a92a31ac053c2768b24e0",
+    "migrations/000001_initial.down.sql": "93f8bbde98c3c95c188b9c512fd638eecb5de51120fe6660b0b03368d610f87f",
+    "migrations/000001_initial.up.sql": "42cad58128ff95f9d1fa0e5807b857506b4bc6d8399d966008e9060e490b3b17",
+    "migrations/000002_outbox_retry.down.sql": "3fe5bd0cbaebacd14ed343f80d1596c688b487cb931553577d87c5bf474cccb0",
+    "migrations/000002_outbox_retry.up.sql": "6f74eb5a5a351108a1599b9a1d130878169a57011f0c60271721cbdbc76cc23b",
+    "migrations/apply.sql": "9c1739b7923c16737d81502e4ae57b1935c3648b34e9b15d6f04858cc8bb95aa",
+    "scripts/build-docker-lab.py": "cbd7aab6d4ff797547f0f7c37609cd7915640c5c3112073a57300e2b3a73bae0",
+    "scripts/verify-docker-lab.py": "a9c418c4fc74503bd141fdd51618dbeaa3a5c2922401813bac3d79b47599e93d",
+    "tests/docker/compose.yml": "bac5b94ed5a3b6369bbc0d1c27ed205695544f59a4cb949eebde8ba56ae5e1eb",
+    "tests/docker/prometheus.yml": "c25662ebd47c3962970e35f3ed50ebb8b4e72c8d05bee84dedbe33196f2ef093"
+  },
+  "baseline_manifest_sha256": "74f6c5d69ab36ae308d77e72200cd303232aa33056a52e6d69ace8460d8461ea",
+  "raw_archive": "/home/postedism/Desktop/Find work/jd-resume-tailor/backups/fleetrelay-docker-20260907T232637Z-675d445b/verification",
+  "artifacts": [
+    {
+      "file": "archive-location.json",
+      "sha256": "0e52c536481fc43de8e6598e91fce4fdf7d104e6b5b38ca934a3d334ff16e7e2",
+      "bytes": 134
+    },
+    {
+      "file": "baseline-manifest.json",
+      "sha256": "74f6c5d69ab36ae308d77e72200cd303232aa33056a52e6d69ace8460d8461ea",
+      "bytes": 12294
+    },
+    {
+      "file": "build-control-api-candidate.log",
+      "sha256": "f401c8386d8267c4fce253c38dc5a41d91dd8515ced85033dcf149e6216daabe",
+      "bytes": 6051
+    },
+    {
+      "file": "build-device-sim-candidate.log",
+      "sha256": "5e358bf29f55d96c7153e00f9cf5cdca254a8ea535ce8ba7a6e5260de55fdef2",
+      "bytes": 3563
+    },
+    {
+      "file": "build-dispatcher-baseline.log",
+      "sha256": "2288d77f137496436495f5dbd7f3aaa2ddbb484cf916c950ea7b947e7a34bb71",
+      "bytes": 5130
+    },
+    {
+      "file": "build-dispatcher-candidate.log",
+      "sha256": "8befaaa5e8d9ea2749695a8233c689b41dd3e817a39112b3a2e9790f98feaa48",
+      "bytes": 2661
+    },
+    {
+      "file": "build-stream-gateway-candidate.log",
+      "sha256": "08c417f5385dbd0f38cdd7fffeba2466754b4675d79633783ba58bf0530b1f85",
+      "bytes": 5188
+    },
+    {
+      "file": "build.py",
+      "sha256": "a8065b92d1805f2b4ceaf3487a7619de2b5e7e45af9f7ad6113b5022b37cd346",
+      "bytes": 1337
+    },
+    {
+      "file": "capture_runtime.py",
+      "sha256": "e8fecbc2e5f49aabba9e9c9620c69894fdde1fca8299d5a570a6544615fd220f",
+      "bytes": 2180
+    },
+    {
+      "file": "coverage.out",
+      "sha256": "96590773b9d31c1a68ad17d91c64143cc77ce80ebc4e16926d8f2af44977bc92",
+      "bytes": 126743
+    },
+    {
+      "file": "crash-device.log",
+      "sha256": "74a0e3648c8cde242a1e931cfbeed5fd230533f9d618eea754ef9b0cd02f68a8",
+      "bytes": 379
+    },
+    {
+      "file": "crash-journal.json",
+      "sha256": "5636dea661b8c55d85f23e6a920bddefa79109bc3e931704a6de8763adf26bf2",
+      "bytes": 401
+    },
+    {
+      "file": "create_build_script.py",
+      "sha256": "363b66793f54b5be13300f030befa9c995608e0bbadd327536c7ff4d063135fe",
+      "bytes": 1136
+    },
+    {
+      "file": "database.dump",
+      "sha256": "f65d1663eebf6fb567b452bc6ad50a9e57103857197c7a16e63da31a01f62712",
+      "bytes": 25351
+    },
+    {
+      "file": "docker-lab-config.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "endpoints.json",
+      "sha256": "1b94766ec3f63c445525c650d407911eca51e843ff5d2800b821b209fa3c2a41",
+      "bytes": 142
+    },
+    {
+      "file": "final-compose-ps.json",
+      "sha256": "84444a1b73c573c5c779f0dfe363d9bf0732156c0186074d7cdebafd60fcceb2",
+      "bytes": 17533
+    },
+    {
+      "file": "final-device-1-journal.json",
+      "sha256": "98f20ef7cf609aecffebcd4dbf4109bc097857ed204b67886299a4d90fb462db",
+      "bytes": 61617
+    },
+    {
+      "file": "final-device-2-journal.json",
+      "sha256": "ead87a5c97e4e67b5a69b60350d919283ff77b25208215564874b416a142d709",
+      "bytes": 61406
+    },
+    {
+      "file": "final-device-3-journal.json",
+      "sha256": "2cf0e64d0f4ce54a4c33904afaee545609da23fa139d23eb901e896c4e69ec3a",
+      "bytes": 61406
+    },
+    {
+      "file": "final-device-4-journal.json",
+      "sha256": "983a7e5e79e5c85f2a045927557846b1de1c575aee5ca7df2f640cc007e7d0c2",
+      "bytes": 61195
+    },
+    {
+      "file": "final-device-crash-journal.json",
+      "sha256": "4519de838a736f2df03c73827539405116d2c89a870e2702e1e84d361a12bf4e",
+      "bytes": 322
+    },
+    {
+      "file": "finalize_report.py",
+      "sha256": "e092f03a84d908fa456537870f6d7b29dd6367fb92634bcd48a7368c8f059539",
+      "bytes": 15368
+    },
+    {
+      "file": "followup-negative-control.log",
+      "sha256": "e3850caa62a563d28a8e7487314fc9e345e9139ccf27de05fad677dbdf5035d9",
+      "bytes": 334
+    },
+    {
+      "file": "go-race-build.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "go-race.log",
+      "sha256": "adede09d432b940bf543f4ce7bcd02a8f90094b6807a641685726601a66ad736",
+      "bytes": 40740
+    },
+    {
+      "file": "go-verification.json",
+      "sha256": "1af54cedc2d62d953264d2bde5040b9fb7272b197ae2638f346abbba0c2db6c6",
+      "bytes": 4626
+    },
+    {
+      "file": "go-vet.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "gofmt.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "grafana-dashboard.json",
+      "sha256": "f01a1ecec4e89e75261aba9c113fcf5197773be469e6ff1d113de9364ad490aa",
+      "bytes": 4069
+    },
+    {
+      "file": "image-builds.json",
+      "sha256": "f1fdd306f6d6ffe50270571670bc9c3389c13fbf6ef22fa65e9de27d17bd487b",
+      "bytes": 10848
+    },
+    {
+      "file": "integration-cleanup.log",
+      "sha256": "13b0e886ea432feb0b07ed3695034ce9c26cb24e02380e7d617cb26de7563417",
+      "bytes": 553
+    },
+    {
+      "file": "integration-start.log",
+      "sha256": "d7fe86887ae13ab7bcfb351ae51e214294f4866c2c118ba86623ae461925a219",
+      "bytes": 775
+    },
+    {
+      "file": "migration-bootstrap.log",
+      "sha256": "5be39c0a8112905e6e5be85466f839b3eece3d97635ad27c7cb2818f93fcff5a",
+      "bytes": 592
+    },
+    {
+      "file": "performance-compose.log",
+      "sha256": "0faa0fc8710886cd53522c87b9271576db618ce1d0a39a182c4014dd2301e120",
+      "bytes": 486528
+    },
+    {
+      "file": "performance-console.log",
+      "sha256": "7a51b0f824bf146c8fafba76f2ef337b51175e495df843f920539535d95053de",
+      "bytes": 8264
+    },
+    {
+      "file": "performance-summary.json",
+      "sha256": "89cbe04009e636df97d95f9bbf3f6446291bd9706a79d70e582ca8c332f359f2",
+      "bytes": 1127
+    },
+    {
+      "file": "performance.json",
+      "sha256": "42d66a20ebe00ee26279a0b30fbfd9ebb453701af245880a0f8bae6874656dfd",
+      "bytes": 239016
+    },
+    {
+      "file": "python-compile.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "file": "reliability-compose.log",
+      "sha256": "58f537e802b865810f06631ec3379b6d712ecfb5cb063b542ab19eff51f6df01",
+      "bytes": 269758
+    },
+    {
+      "file": "reliability-failure.json",
+      "sha256": "11ae0b25f1ee971c0f596ccc5bf1a223491b2bc3963c27dade20ab4a6a012f90",
+      "bytes": 293
+    },
+    {
+      "file": "reliability.json",
+      "sha256": "9af33dbbe4a01fd1da7d95dd6066e5c6690bd26d8faaa94a8eb0d40584f7e546",
+      "bytes": 5960
+    },
+    {
+      "file": "runtime-environment.json",
+      "sha256": "66f1a132f3b7b4020319c87c7c8ed747017a8a5c7cf2505bcceb82ef9852e35b",
+      "bytes": 2033
+    },
+    {
+      "file": "verify_go.py",
+      "sha256": "37b896e36b62ee6ebc26338d68ed703873ba55e0745f96a9fcabe8f0629657cf",
+      "bytes": 2530
+    },
+    {
+      "file": "failed-attempt-1/reliability-compose.log",
+      "sha256": "d6f9828b9ded2af29339c9a2eb33bdc9c2fa5754ad33c05942524ec7740e9c79",
+      "bytes": 194784
+    },
+    {
+      "file": "failed-attempt-1/reliability-failure.json",
+      "sha256": "11ae0b25f1ee971c0f596ccc5bf1a223491b2bc3963c27dade20ab4a6a012f90",
+      "bytes": 293
+    }
+  ],
+  "verification_boundaries": {
+    "implemented": [
+      "optional simulator durable result journal",
+      "bounded Dispatcher follow-up pass",
+      "isolated Docker lab and paired workload harness"
+    ],
+    "verified_local": [
+      "29 top-level race tests; no skip/fail",
+      "8 local Docker scenarios",
+      "1000 measured commands in five alternating pairs"
+    ],
+    "not_verified": [
+      "physical actuator or external vendor idempotency",
+      "actual power-loss/fsync guarantees on target hardware",
+      "cloud or production deployment",
+      "managed multi-node database failover or regional DR",
+      "PITR and independent-instance restore",
+      "production SLO/capacity/N-1/soak",
+      "full OpenTelemetry tracing and remaining application metrics",
+      "hosted CI, remote publication, security-current dependencies/images"
+    ]
+  },
+  "failed_runs": [
+    {
+      "location": "failed-attempt-1",
+      "reason": "Harness incorrectly expected lease creation HTTP 200; actual API returned HTTP 201. Corrected harness rerun passed all eight scenarios."
+    }
+  ],
+  "negative_control": "New same-batch delivery oracle fails on archived prior Dispatcher with zero Redis messages and passes on the candidate. Expected exit 1 is excluded from regression failures."
+}
